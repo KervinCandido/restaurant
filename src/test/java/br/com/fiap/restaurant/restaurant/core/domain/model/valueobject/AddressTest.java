@@ -1,0 +1,46 @@
+package br.com.fiap.restaurant.restaurant.core.domain.model.valueobject;
+
+import br.com.fiap.restaurant.restaurant.core.domain.model.util.AddressBuilder;
+import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+class AddressTest {
+
+    @Test
+    @DisplayName("Deve criar Address válido sem lançar exceção")
+    void deveCriarAddressValido() {
+        // Arrange
+        var addressBuilder = new AddressBuilder();
+
+        // Act & Assert
+        assertDoesNotThrow(addressBuilder::build);
+    }
+
+    @Test
+    @DisplayName("Deve lançar BusinessException quando rua for nula")
+    void deveLancarExcecaoQuandoRuaForNula() {
+        // Arrange
+        var addressBuilder = new AddressBuilder().withStreet(null);
+
+        // Act & Assert
+        assertThatThrownBy(addressBuilder::build)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Rua é obrigatória.");
+    }
+
+    @Test
+    @DisplayName("Deve lançar BusinessException sem rua")
+    void deveLancarExcecaoSemRua() {
+        // Arrange
+        var addressBuilder = new AddressBuilder().withStreet("");
+
+        // Act & Assert
+        assertThatThrownBy(addressBuilder::build)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Rua é obrigatória.");
+    }
+}

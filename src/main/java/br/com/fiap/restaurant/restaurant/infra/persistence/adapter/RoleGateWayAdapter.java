@@ -1,0 +1,35 @@
+package br.com.fiap.restaurant.restaurant.infra.persistence.adapter;
+
+import br.com.fiap.restaurant.restaurant.core.domain.model.Role;
+import br.com.fiap.restaurant.restaurant.core.gateway.RoleGateway;
+import br.com.fiap.restaurant.restaurant.infra.mapper.RoleMapper;
+import br.com.fiap.restaurant.restaurant.infra.persistence.repository.RoleRepository;
+import org.springframework.stereotype.Component;
+
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Component
+public class RoleGateWayAdapter implements RoleGateway {
+
+    private final RoleRepository repository;
+    private final RoleMapper roleMapper;
+
+    public RoleGateWayAdapter(RoleRepository repository, RoleMapper roleMapper) {
+        this.repository = repository;
+        this.roleMapper = roleMapper;
+    }
+
+    @Override
+    public Set<Role> getRolesByName(Set<String> rolesName) {
+        Objects.requireNonNull(rolesName, "RolesName cannot be null.");
+        if (rolesName.isEmpty()) return Set.of();
+        return repository.findByNameIn(rolesName).stream().map(roleMapper::toDomain).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<Role> findAll() {
+        return repository.findAll().stream().map(roleMapper::toDomain).collect(Collectors.toSet());
+    }
+}
