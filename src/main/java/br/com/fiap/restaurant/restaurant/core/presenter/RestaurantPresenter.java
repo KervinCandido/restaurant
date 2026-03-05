@@ -1,51 +1,29 @@
 package br.com.fiap.restaurant.restaurant.core.presenter;
 
-import br.com.fiap.restaurant.restaurant.core.domain.model.Restaurant;
-import br.com.fiap.restaurant.restaurant.core.outbound.*;
-
-import java.util.stream.Collectors;
+import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
+import br.com.fiap.restaurant.restaurant.core.domain.User;
+import br.com.fiap.restaurant.restaurant.core.outbound.RestaurantManagementOutput;
 
 public class RestaurantPresenter {
 
     private RestaurantPresenter() {}
 
-    public static RestaurantPublicOutput toOutput(Restaurant restaurant) {
-
-        Long restaurantId = restaurant.getId();
-
-        return new RestaurantPublicOutput(
-                restaurant.getId(),
-                restaurant.getName(),
-                AddressPresenter.toOutput(restaurant.getAddress()),
-                restaurant.getCuisineType(),
-                restaurant.getOpeningHours().stream()
-                        .map(OpeningHoursPresenter::toOutput)
-                        .collect(Collectors.toUnmodifiableSet()),
-                restaurant.getMenuItems().stream()
-                        .map(menuItem -> MenuItemPresenter.toOutput(menuItem, restaurantId))
-                        .collect(Collectors.toUnmodifiableSet())
-        );
-    }
-
     public static RestaurantManagementOutput toManagementOutput(Restaurant restaurant) {
 
-        Long restaurantId = restaurant.getId();
+        var address = AddressPresenter.toOutput(restaurant.getAddress());
+        var openingHours = restaurant.getOpeningHours().stream().map(OpeningHoursPresenter::toOutput).toList();
+        var menu = restaurant.getMenuItems().stream().map(MenuItemPresenter::toOutput).toList();
+        var employees = restaurant.getEmployees().stream().map(User::getUuid).toList();
 
         return new RestaurantManagementOutput(
                 restaurant.getId(),
                 restaurant.getName(),
-                AddressPresenter.toOutput(restaurant.getAddress()),
                 restaurant.getCuisineType(),
-                restaurant.getOpeningHours().stream()
-                        .map(OpeningHoursPresenter::toOutput)
-                        .collect(Collectors.toUnmodifiableSet()),
-                restaurant.getMenuItems().stream()
-                        .map(menuItem -> MenuItemPresenter.toOutput(menuItem, restaurantId))
-                        .collect(Collectors.toUnmodifiableSet()),
-                restaurant.getEmployees().stream()
-                        .map(UserPresenter::toSummaryOutput)
-                        .collect(Collectors.toUnmodifiableSet()),
-                UserPresenter.toSummaryOutput(restaurant.getOwner())
+                address,
+                restaurant.getOwner().getUuid(),
+                openingHours,
+                menu,
+                employees
         );
     }
 }

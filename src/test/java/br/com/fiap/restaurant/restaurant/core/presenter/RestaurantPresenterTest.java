@@ -1,10 +1,11 @@
 package br.com.fiap.restaurant.restaurant.core.presenter;
 
-import br.com.fiap.restaurant.restaurant.core.domain.model.*;
-import br.com.fiap.restaurant.restaurant.core.domain.model.util.*;
-import br.com.fiap.restaurant.restaurant.core.domain.model.valueobject.Address;
-import br.com.fiap.restaurant.restaurant.core.domain.model.valueobject.OpeningHours;
-import br.com.fiap.restaurant.restaurant.core.outbound.RestaurantPublicOutput;
+import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
+import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
+import br.com.fiap.restaurant.restaurant.core.domain.User;
+import br.com.fiap.restaurant.restaurant.core.domain.valueobject.Address;
+import br.com.fiap.restaurant.restaurant.core.domain.valueobject.OpeningHours;
+import br.com.fiap.restaurant.restaurant.core.outbound.RestaurantManagementOutput;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,70 +20,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Testes para RestaurantPresenter")
 class RestaurantPresenterTest {
 
+    @DisplayName("Deve converter Restaurant para RestaurantManagementOutput com sucesso")
     @Test
-    @DisplayName("Deve converter Restaurant para RestaurantOutput corretamente")
-    void shouldConvertRestaurantToRestaurantOutput() {
-        // Arrange
-        // Address
-        Address address = new Address("Rua A", "10", "Cidade B", "Estado C", "12345-678", "Comp");
-
-        // OpeningHours
-        OpeningHours openingHours = new OpeningHours(1L, DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(22, 0));
-
-        // MenuItem
-        MenuItem menuItem = new MenuItemBuilder()
-                .withId(1L)
-                .withName("Item 1")
-                .withDescription("Desc")
-                .withPrice(new BigDecimal("20.00"))
-                .withRestaurantOnly(false)
-                .withPhotoPath("/img.jpg")
-                .build();
-
-        Set<MenuItem> menu = Set.of(menuItem);
-        var employee = new UserBuilder().build();
-        var employees = Set.of(employee);
-
-        // Owner (User)
-        Role role = new Role(1L, "RESTAURANT_OWNER");
-        UserType userType = new UserType(1L, "Dono", Set.of(role));
-        User owner = new UserBuilder()
-                .withId(UUID.randomUUID())
-                .withName("Owner Name")
-                .withEmail("ownerId@test.com")
-                .withAddress(address)
-                .withUserType(userType)
-                .withPasswordHash("HASHED_DEFAULT")
-                .build();
-
-        // Restaurant
-        Long restaurantId = 100L;
-        String restaurantName = "Restaurante Teste";
+    void deveConverterRestaurantParaRestaurantManagementOutputComSucesso() {
+        Long id = 1L;
+        String name = "Restaurante Teste";
+        Address address = new Address("Rua Teste", "123", "Bairro Teste", "Cidade Teste", "Estado Teste", "CEP Teste");
         String cuisineType = "Italiana";
-        Restaurant restaurant = new Restaurant(restaurantId, restaurantName, address, cuisineType, owner);
+        User owner = new User(UUID.randomUUID(), Set.of(User.RESTAURANT_OWNER));
+
+        Restaurant restaurant = new Restaurant(id, name, address, cuisineType, owner);
+
+        OpeningHours openingHours = new OpeningHours(1L, DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(18, 0));
         restaurant.addOpeningHours(openingHours);
-        restaurant.addMenuItems(menu);
-        restaurant.addEmployees(employees);
 
-        // Act
-        RestaurantPublicOutput output = RestaurantPresenter.toOutput(restaurant);
+        MenuItem menuItem = new MenuItem(1L, "Pizza", "Delicious pizza", new BigDecimal("50.00"), false, "/images/pizza.jpg");
+        restaurant.addMenuItem(menuItem);
 
-        // Assert
+        User employee = new User(UUID.randomUUID(), Set.of("ROLE_USER"));
+        restaurant.addEmployee(employee);
+
+        RestaurantManagementOutput output = RestaurantPresenter.toManagementOutput(restaurant);
+
         assertThat(output).isNotNull();
-        assertThat(output.id()).isEqualTo(restaurantId);
-        assertThat(output.name()).isEqualTo(restaurantName);
+        assertThat(output.id()).isEqualTo(id);
+        assertThat(output.name()).isEqualTo(name);
         assertThat(output.cuisineType()).isEqualTo(cuisineType);
-
-        // Verifica AddressOutput
         assertThat(output.address()).isNotNull();
-        assertThat(output.address().street()).isEqualTo(address.getStreet());
-
-        // Verifica OpeningHoursOutput
+        assertThat(output.ownerUuid()).isEqualTo(owner.getUuid());
         assertThat(output.openingHours()).hasSize(1);
-        assertThat(output.openingHours().iterator().next().id()).isEqualTo(openingHours.getId());
-
-        // Verifica MenuItemOutput
-        assertThat(output.menuItems()).hasSize(1);
-        assertThat(output.menuItems().iterator().next().id()).isEqualTo(menuItem.getId());
+        assertThat(output.menu()).hasSize(1);
+        assertThat(output.employees()).hasSize(1).contains(employee.getUuid());
     }
 }

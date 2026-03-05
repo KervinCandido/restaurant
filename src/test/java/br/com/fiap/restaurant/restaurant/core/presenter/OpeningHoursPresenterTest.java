@@ -1,6 +1,6 @@
 package br.com.fiap.restaurant.restaurant.core.presenter;
 
-import br.com.fiap.restaurant.restaurant.core.domain.model.valueobject.OpeningHours;
+import br.com.fiap.restaurant.restaurant.core.domain.valueobject.OpeningHours;
 import br.com.fiap.restaurant.restaurant.core.outbound.OpeningHoursOutput;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,14 +13,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Testes para OpeningHoursPresenter")
 class OpeningHoursPresenterTest {
 
+    @DisplayName("Deve converter OpeningHours para OpeningHoursOutput com sucesso")
     @Test
-    @DisplayName("Deve converter OpeningHours para OpeningHoursOutput corretamente")
-    void shouldConvertOpeningHoursToOpeningHoursOutput() {
+    void deveConverterOpeningHoursParaOpeningHoursOutputComSucesso() {
         Long id = 1L;
         DayOfWeek dayOfWeek = DayOfWeek.MONDAY;
         LocalTime openHour = LocalTime.of(9, 0);
         LocalTime closeHour = LocalTime.of(18, 0);
-
         OpeningHours openingHours = new OpeningHours(id, dayOfWeek, openHour, closeHour);
 
         OpeningHoursOutput output = OpeningHoursPresenter.toOutput(openingHours);

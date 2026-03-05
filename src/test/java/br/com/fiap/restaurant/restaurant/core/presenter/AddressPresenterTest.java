@@ -1,6 +1,6 @@
 package br.com.fiap.restaurant.restaurant.core.presenter;
 
-import br.com.fiap.restaurant.restaurant.core.domain.model.valueobject.Address;
+import br.com.fiap.restaurant.restaurant.core.domain.valueobject.Address;
 import br.com.fiap.restaurant.restaurant.core.outbound.AddressOutput;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,26 +10,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Testes para AddressPresenter")
 class AddressPresenterTest {
 
+    @DisplayName("Deve converter Address para AddressOutput com sucesso")
     @Test
-    @DisplayName("Deve converter Address para AddressOutput corretamente")
-    void shouldConvertAddressToAddressOutput() {
-        String street = "Rua das Flores";
-        String number = "123";
-        String city = "São Paulo";
-        String state = "SP";
-        String zipCode = "01234-567";
-        String complement = "Apto 101";
-
-        Address address = new Address(street, number, city, state, zipCode, complement);
+    void deveConverterAddressParaAddressOutputComSucesso() {
+        Address address = new Address("Rua Teste", "123", "Bairro Teste", "Cidade Teste", "Estado Teste", "CEP Teste");
+        address.setComplement("Apto 101");
 
         AddressOutput output = AddressPresenter.toOutput(address);
 
         assertThat(output).isNotNull();
-        assertThat(output.street()).isEqualTo(street);
-        assertThat(output.number()).isEqualTo(number);
-        assertThat(output.city()).isEqualTo(city);
-        assertThat(output.state()).isEqualTo(state);
-        assertThat(output.zipCode()).isEqualTo(zipCode);
-        assertThat(output.complement()).isEqualTo(complement);
+        assertThat(output.street()).isEqualTo(address.getStreet());
+        assertThat(output.number()).isEqualTo(address.getNumber());
+        assertThat(output.city()).isEqualTo(address.getCity());
+        assertThat(output.state()).isEqualTo(address.getState());
+        assertThat(output.zipCode()).isEqualTo(address.getZipCode());
+        assertThat(output.complement()).isEqualTo(address.getComplement());
     }
 }
