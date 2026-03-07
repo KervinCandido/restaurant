@@ -14,7 +14,7 @@ import java.util.Set;
 public class Restaurant {
 
     public static final String VIEW_RESTAURANT = "VIEW_RESTAURANT";
-    public static final String VIEW_RESTAURANT_MANAGEMENT = "VIEW_RESTAURANT";
+    public static final String VIEW_RESTAURANT_MANAGEMENT = "VIEW_RESTAURANT_MANAGEMENT";
     public static final String CREATE_RESTAURANT = "CREATE_RESTAURANT";
     public static final String UPDATE_RESTAURANT = "UPDATE_RESTAURANT";
     public static final String DELETE_RESTAURANT = "DELETE_RESTAURANT";

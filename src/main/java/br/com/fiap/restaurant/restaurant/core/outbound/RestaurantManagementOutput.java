@@ -8,7 +8,7 @@ public record RestaurantManagementOutput (
         String name,
         String cuisineType,
         AddressOutput address,
-        UUID ownerUuid,
+        UUID owner,
         List<OpeningHoursOutput> openingHours,
         List<MenuItemOutput> menu,
         List<UUID> employees) {}

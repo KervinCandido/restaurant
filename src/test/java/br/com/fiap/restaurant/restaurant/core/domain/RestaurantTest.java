@@ -73,7 +73,7 @@ class RestaurantTest {
                 .hasMessageContaining("O tipo de cozinha não pode ser nulo");
     }
 
-    @DisplayName("Deve lançar NullPointerException se ownerUuid for nulo")
+    @DisplayName("Deve lançar NullPointerException se owner for nulo")
     @Test
     void deveLancarNullPointerSeOwnerForNulo() {
         assertThatThrownBy(() -> new Restaurant(1L, "Restaurante Teste", address, "Italiana", null))
@@ -97,7 +97,7 @@ class RestaurantTest {
                 .hasMessageContaining("O tipo de cozinha não pode ser vazio");
     }
 
-    @DisplayName("Deve lançar UserCannotBeRestaurantOwnerException se ownerUuid não tiver permissão")
+    @DisplayName("Deve lançar UserCannotBeRestaurantOwnerException se owner não tiver permissão")
     @Test
     void deveLancarUserCannotBeRestaurantOwnerExceptionSeOwnerNaoTiverPermissao() {
         User userNotOwner = new User(UUID.randomUUID(), Set.of(Restaurant.VIEW_RESTAURANT));

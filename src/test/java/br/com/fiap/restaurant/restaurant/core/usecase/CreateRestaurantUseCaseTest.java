@@ -227,7 +227,7 @@ class CreateRestaurantUseCaseTest {
         then(createRestaurantNotifierGateway).shouldHaveNoInteractions();
     }
 
-    @DisplayName("Deve lançar UserNotFoundException quando o ownerUuid não é encontrado")
+    @DisplayName("Deve lançar UserNotFoundException quando o owner não é encontrado")
     @Test
     void deveLancarUserNotFoundExceptionQuandoOwnerNaoForEncontrado() {
         String restaurantName = "Restaurante Teste";

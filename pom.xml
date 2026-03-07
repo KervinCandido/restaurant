@@ -141,6 +141,8 @@
                         <exclude>**/core/outbound/*.class</exclude>
                         <exclude>**/infra/persistence/entity/*.class</exclude>
                         <exclude>**/infra/persistence/repository/*.class</exclude>
+                        <exclude>**/infra/dto/*.class</exclude>
+                        <exclude>**/infra/config/*.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>

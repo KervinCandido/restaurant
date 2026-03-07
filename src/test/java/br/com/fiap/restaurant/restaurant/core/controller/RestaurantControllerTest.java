@@ -64,7 +64,7 @@ class RestaurantControllerTest {
         assertThat(output.id()).isEqualTo(restaurant.getId());
         assertThat(output.name()).isEqualTo(restaurant.getName());
         assertThat(output.cuisineType()).isEqualTo(restaurant.getCuisineType());
-        assertThat(output.ownerUuid()).isEqualTo(ownerId);
+        assertThat(output.owner()).isEqualTo(ownerId);
 
         then(createRestaurantUseCase).should().execute(input);
     }

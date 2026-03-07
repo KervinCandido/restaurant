@@ -47,7 +47,7 @@ class RestaurantPresenterTest {
         assertThat(output.name()).isEqualTo(name);
         assertThat(output.cuisineType()).isEqualTo(cuisineType);
         assertThat(output.address()).isNotNull();
-        assertThat(output.ownerUuid()).isEqualTo(owner.getUuid());
+        assertThat(output.owner()).isEqualTo(owner.getUuid());
         assertThat(output.openingHours()).hasSize(1);
         assertThat(output.menu()).hasSize(1);
         assertThat(output.employees()).hasSize(1).contains(employee.getUuid());
