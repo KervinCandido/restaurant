@@ -4,6 +4,7 @@ import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.UserGateway;
 import br.com.fiap.restaurant.restaurant.core.usecase.CreateRestaurantUseCase;
+import br.com.fiap.restaurant.restaurant.infra.publisher.RestaurantCreatedPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,9 +21,10 @@ public class CoreUseCaseConfig {
     public CreateRestaurantUseCase createRestaurantUseCase(
             LoggedUserGateway loggedUserGateway,
             RestaurantGateway restaurantGateway,
-            UserGateway userGateway
+            UserGateway userGateway,
+            RestaurantCreatedPublisher restaurantCreatedPublisher
     ) {
-        return new CreateRestaurantUseCase(loggedUserGateway, restaurantGateway, userGateway, List.of());
+        return new CreateRestaurantUseCase(loggedUserGateway, restaurantGateway, userGateway, List.of(restaurantCreatedPublisher));
     }
 }
 

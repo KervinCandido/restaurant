@@ -9,7 +9,7 @@ import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedExcep
 import br.com.fiap.restaurant.restaurant.core.exception.RestaurantNameIsAlreadyInUseException;
 import br.com.fiap.restaurant.restaurant.core.exception.UserNotFoundException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
-import br.com.fiap.restaurant.restaurant.core.gateway.NotifierGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.UserGateway;
 import br.com.fiap.restaurant.restaurant.core.inbound.CreateRestaurantInput;
@@ -23,13 +23,13 @@ public class CreateRestaurantUseCase {
     private final LoggedUserGateway loggedUserGateway;
     private final RestaurantGateway restaurantGateway;
     private final UserGateway userGateway;
-    private final List<NotifierGateway<Restaurant>> notifierGateways;
+    private final List<PublisherGateway<Restaurant>> publisherGateways;
 
-    public CreateRestaurantUseCase(LoggedUserGateway loggedUserGateway, RestaurantGateway restaurantGateway, UserGateway userGateway, List<NotifierGateway<Restaurant>> notifierGateways) {
+    public CreateRestaurantUseCase(LoggedUserGateway loggedUserGateway, RestaurantGateway restaurantGateway, UserGateway userGateway, List<PublisherGateway<Restaurant>> publisherGateways) {
         this.loggedUserGateway = Objects.requireNonNull(loggedUserGateway, "loggedUserGateway cannot be null.");
         this.restaurantGateway = Objects.requireNonNull(restaurantGateway, "restaurantGateway cannot be null.");
         this.userGateway = Objects.requireNonNull(userGateway, "userGateway cannot be null.");
-        this.notifierGateways = Objects.requireNonNull(notifierGateways, "notifierGateways cannot be null.");
+        this.publisherGateways = Objects.requireNonNull(publisherGateways, "notifierGateways cannot be null.");
     }
 
     public Restaurant execute(CreateRestaurantInput input) {
@@ -81,7 +81,7 @@ public class CreateRestaurantUseCase {
 
         var newRestaurant = restaurantGateway.save(restaurant);
 
-        notifierGateways.forEach(n -> n.send(newRestaurant));
+        publisherGateways.forEach(n -> n.publish(newRestaurant));
 
         return newRestaurant;
     }
