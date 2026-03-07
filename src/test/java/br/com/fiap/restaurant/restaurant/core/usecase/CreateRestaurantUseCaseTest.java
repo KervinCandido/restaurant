@@ -9,7 +9,7 @@ import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedExcep
 import br.com.fiap.restaurant.restaurant.core.exception.RestaurantNameIsAlreadyInUseException;
 import br.com.fiap.restaurant.restaurant.core.exception.UserNotFoundException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
-import br.com.fiap.restaurant.restaurant.core.gateway.NotifierGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.UserGateway;
 import br.com.fiap.restaurant.restaurant.core.inbound.AddressInput;
@@ -51,7 +51,7 @@ class CreateRestaurantUseCaseTest {
     private UserGateway userGateway;
 
     @Mock
-    private NotifierGateway<Restaurant> createRestaurantNotifierGateway;
+    private PublisherGateway<Restaurant> createRestaurantPublisherGateway;
 
     private CreateRestaurantUseCase createRestaurantUseCase;
 
@@ -97,7 +97,7 @@ class CreateRestaurantUseCaseTest {
         this.employees = new HashSet<>(1);
         this.employees.add(UUID.randomUUID());
 
-        this.createRestaurantUseCase = new CreateRestaurantUseCase(loggedUserGateway, restaurantGateway, userGateway, List.of(createRestaurantNotifierGateway));
+        this.createRestaurantUseCase = new CreateRestaurantUseCase(loggedUserGateway, restaurantGateway, userGateway, List.of(createRestaurantPublisherGateway));
     }
 
     @DisplayName("Deve criar restaurante com sucesso")
@@ -125,7 +125,7 @@ class CreateRestaurantUseCaseTest {
         given(userGateway.findById(owner.getUuid())).willReturn(Optional.of(owner));
         given(userGateway.findAllById(employees)).willReturn(restaurant.getEmployees().stream().toList());
         given(restaurantGateway.save(any(Restaurant.class))).willReturn(restaurant);
-        given(createRestaurantNotifierGateway.send(restaurant)).willReturn(new CompletableFuture<>());
+        given(createRestaurantPublisherGateway.publish(restaurant)).willReturn(new CompletableFuture<>());
 
         Restaurant newRestaurant = createRestaurantUseCase.execute(createRestaurantInput);
 
@@ -136,7 +136,7 @@ class CreateRestaurantUseCaseTest {
         then(userGateway).should().findById(owner.getUuid());
         then(userGateway).should().findAllById(employees);
         then(restaurantGateway).should().save(restaurantArgumentCaptor.capture());
-        then(createRestaurantNotifierGateway).should().send(restaurant);
+        then(createRestaurantPublisherGateway).should().publish(restaurant);
 
         var restaurantCaptured = restaurantArgumentCaptor.getValue();
 
@@ -166,7 +166,7 @@ class CreateRestaurantUseCaseTest {
         then(restaurantGateway).shouldHaveNoInteractions();
         then(userGateway).shouldHaveNoInteractions();
         then(userGateway).shouldHaveNoInteractions();
-        then(createRestaurantNotifierGateway).shouldHaveNoInteractions();
+        then(createRestaurantPublisherGateway).shouldHaveNoInteractions();
     }
 
     @DisplayName("Deve lançar OperationNotAllowedException se o usuário não tiver permissão para criar restaurante")
@@ -194,7 +194,7 @@ class CreateRestaurantUseCaseTest {
         then(restaurantGateway).shouldHaveNoInteractions();
         then(userGateway).shouldHaveNoInteractions();
         then(userGateway).shouldHaveNoInteractions();
-        then(createRestaurantNotifierGateway).shouldHaveNoInteractions();
+        then(createRestaurantPublisherGateway).shouldHaveNoInteractions();
     }
 
     @DisplayName("Deve lançar RestaurantNameIsAlreadyInUseException se o nome já existiver sendo usado")
@@ -224,7 +224,7 @@ class CreateRestaurantUseCaseTest {
         then(userGateway).shouldHaveNoInteractions();
         then(userGateway).shouldHaveNoInteractions();
         then(restaurantGateway).shouldHaveNoMoreInteractions();
-        then(createRestaurantNotifierGateway).shouldHaveNoInteractions();
+        then(createRestaurantPublisherGateway).shouldHaveNoInteractions();
     }
 
     @DisplayName("Deve lançar UserNotFoundException quando o owner não é encontrado")
@@ -255,7 +255,7 @@ class CreateRestaurantUseCaseTest {
         then(userGateway).should().findById(owner.getUuid());
         then(userGateway).shouldHaveNoMoreInteractions();
         then(restaurantGateway).shouldHaveNoMoreInteractions();
-        then(createRestaurantNotifierGateway).shouldHaveNoInteractions();
+        then(createRestaurantPublisherGateway).shouldHaveNoInteractions();
     }
 
     @DisplayName("Deve lançar UserNotFoundException se não encontrar algum employee")
@@ -287,6 +287,6 @@ class CreateRestaurantUseCaseTest {
         then(userGateway).should().findById(owner.getUuid());
         then(userGateway).should().findAllById(employees);
         then(restaurantGateway).shouldHaveNoMoreInteractions();
-        then(createRestaurantNotifierGateway).shouldHaveNoInteractions();
+        then(createRestaurantPublisherGateway).shouldHaveNoInteractions();
     }
 }
