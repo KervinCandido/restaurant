@@ -1,6 +1,6 @@
 package br.com.fiap.restaurant.restaurant.infra.config;
 
-import br.com.fiap.restaurant.restaurant.auth.LoggedUserGatewayAdapter;
+import br.com.fiap.restaurant.restaurant.infra.auth.LoggedUserGatewayAdapter;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.UserGateway;
