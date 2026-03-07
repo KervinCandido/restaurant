@@ -1,4 +1,4 @@
-package br.com.fiap.restaurant.restaurant.auth;
+package br.com.fiap.restaurant.restaurant.infra.auth;
 
 import br.com.fiap.restaurant.restaurant.core.domain.User;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
