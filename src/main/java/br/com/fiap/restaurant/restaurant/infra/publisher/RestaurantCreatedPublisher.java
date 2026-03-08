@@ -20,6 +20,6 @@ public class RestaurantCreatedPublisher implements PublisherGateway<Restaurant> 
 
     @Override
     public Future<Void> publish(Restaurant restaurant) {
-        return CompletableFuture.runAsync(() -> rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY, restaurant));
+        return CompletableFuture.runAsync(() -> rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.NEW_RESTAURANT_ROUTING_KEY, restaurant));
     }
 }
