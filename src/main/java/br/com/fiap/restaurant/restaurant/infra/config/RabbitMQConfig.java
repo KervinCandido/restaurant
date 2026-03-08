@@ -16,8 +16,8 @@ import java.util.Map;
 public class RabbitMQConfig {
 
     public static final String EXCHANGE_NAME = "restaurant-exchange";
-    public static final String QUEUE_NAME = "fila-novo-restaurant";
-    public static final String ROUTING_KEY = "novo-restaurant";
+    public static final String NEW_RESTAURANT_QUEUE = "fila-novo-restaurante";
+    public static final String NEW_RESTAURANT_ROUTING_KEY = "novo-restaurante";
 
     @Bean
     public DirectExchange directExchange() {
@@ -26,12 +26,12 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue queue() {
-        return  new Queue(QUEUE_NAME, true, false, false, Map.of("x-queue-type", "quorum"));
+        return new Queue(NEW_RESTAURANT_QUEUE, true, false, false, Map.of("x-queue-type", "quorum"));
     }
 
     @Bean
     public Binding binding(Queue queue, DirectExchange directExchange) {
-        return BindingBuilder.bind(queue).to(directExchange).with(ROUTING_KEY);
+        return BindingBuilder.bind(queue).to(directExchange).with(NEW_RESTAURANT_ROUTING_KEY);
     }
 
     @Bean
