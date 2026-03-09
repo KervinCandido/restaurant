@@ -3,7 +3,7 @@ package br.com.fiap.restaurant.restaurant.infra.config;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.UserGateway;
-import br.com.fiap.restaurant.restaurant.core.usecase.CreateRestaurantUseCase;
+import br.com.fiap.restaurant.restaurant.core.usecase.restaurant.CreateRestaurantUseCase;
 import br.com.fiap.restaurant.restaurant.infra.publisher.RestaurantCreatedPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

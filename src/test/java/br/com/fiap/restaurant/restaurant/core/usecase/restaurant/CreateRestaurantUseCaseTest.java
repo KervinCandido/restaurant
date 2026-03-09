@@ -1,4 +1,4 @@
-package br.com.fiap.restaurant.restaurant.core.usecase;
+package br.com.fiap.restaurant.restaurant.core.usecase.restaurant;
 
 import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
@@ -280,7 +280,7 @@ class CreateRestaurantUseCaseTest {
 
         assertThatThrownBy(()-> createRestaurantUseCase.execute(createRestaurantInput))
                 .isInstanceOf(UserNotFoundException.class)
-                .hasMessageContaining("employee(s) not found");
+                .hasMessageContaining("employee(s) not found "+ employees);
 
         then(loggedUserGateway).should().hasRole(Restaurant.CREATE_RESTAURANT);
         then(restaurantGateway).should().existsRestaurantWithName(restaurantName);

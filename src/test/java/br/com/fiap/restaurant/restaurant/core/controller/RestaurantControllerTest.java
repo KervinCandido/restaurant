@@ -6,7 +6,7 @@ import br.com.fiap.restaurant.restaurant.core.domain.valueobject.Address;
 import br.com.fiap.restaurant.restaurant.core.inbound.AddressInput;
 import br.com.fiap.restaurant.restaurant.core.inbound.CreateRestaurantInput;
 import br.com.fiap.restaurant.restaurant.core.outbound.RestaurantManagementOutput;
-import br.com.fiap.restaurant.restaurant.core.usecase.CreateRestaurantUseCase;
+import br.com.fiap.restaurant.restaurant.core.usecase.restaurant.CreateRestaurantUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

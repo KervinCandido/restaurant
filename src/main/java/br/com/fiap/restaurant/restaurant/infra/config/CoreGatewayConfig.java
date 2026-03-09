@@ -1,9 +1,9 @@
 package br.com.fiap.restaurant.restaurant.infra.config;
 
-import br.com.fiap.restaurant.restaurant.infra.auth.LoggedUserGatewayAdapter;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.UserGateway;
+import br.com.fiap.restaurant.restaurant.infra.auth.LoggedUserGatewayAdapter;
 import br.com.fiap.restaurant.restaurant.infra.persistence.adapter.RestaurantGatewayAdapter;
 import br.com.fiap.restaurant.restaurant.infra.persistence.adapter.UserGatewayAdapter;
 import br.com.fiap.restaurant.restaurant.infra.persistence.repository.RestaurantRepository;
@@ -20,8 +20,8 @@ public class CoreGatewayConfig {
     }
 
     @Bean
-    public RestaurantGateway restaurantGateway(RestaurantRepository restaurantRepository) {
-        return new RestaurantGatewayAdapter(restaurantRepository);
+    public RestaurantGateway restaurantGateway(RestaurantRepository restaurantRepository, UserRepository userRepository) {
+        return new RestaurantGatewayAdapter(restaurantRepository, userRepository);
     }
 
     @Bean

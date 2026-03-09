@@ -1,4 +1,4 @@
-package br.com.fiap.restaurant.restaurant.core.usecase;
+package br.com.fiap.restaurant.restaurant.core.usecase.restaurant;
 
 import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;

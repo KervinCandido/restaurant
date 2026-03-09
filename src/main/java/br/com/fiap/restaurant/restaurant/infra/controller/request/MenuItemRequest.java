@@ -1,4 +1,4 @@
-package br.com.fiap.restaurant.restaurant.infra.controller.resquest;
+package br.com.fiap.restaurant.restaurant.infra.controller.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

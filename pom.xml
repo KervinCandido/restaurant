@@ -156,10 +156,14 @@
                         <exclude>**/core/exception/*.class</exclude>
                         <exclude>**/core/inbound/*.class</exclude>
                         <exclude>**/core/outbound/*.class</exclude>
+                        <exclude>**/core/domain/pagination/*.class</exclude>
                         <exclude>**/infra/persistence/entity/*.class</exclude>
                         <exclude>**/infra/persistence/repository/*.class</exclude>
                         <exclude>**/infra/dto/*.class</exclude>
                         <exclude>**/infra/config/*.class</exclude>
+                        <exclude>**/infra/controller/response/*.class</exclude>
+                        <exclude>**/infra/controller/request/*.class</exclude>
+                        <exclude>**/infra/controller/mapper/*Impl.class</exclude> <!-- MapStruct -->
                     </excludes>
                 </configuration>
                 <executions>

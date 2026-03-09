@@ -4,8 +4,6 @@ import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.infra.persistence.entity.MenuItemEntity;
 import br.com.fiap.restaurant.restaurant.infra.persistence.entity.RestaurantEntity;
 
-import java.math.BigDecimal;
-
 public class MenuItemMapper {
 
     private MenuItemMapper() {}

@@ -2,8 +2,6 @@ package br.com.fiap.restaurant.restaurant.infra.auth;
 
 import br.com.fiap.restaurant.restaurant.core.domain.User;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
-import br.com.fiap.restaurant.restaurant.infra.persistence.entity.UserEntity;
-import br.com.fiap.restaurant.restaurant.infra.persistence.mapper.UserMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,8 +29,8 @@ public class LoggedUserGatewayAdapter implements LoggedUserGateway {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) return Optional.empty();
 
-        if (auth.getPrincipal() instanceof UserEntity u) {
-            return Optional.of(UserMapper.toDomain(u));
+        if (auth.getPrincipal() instanceof User u) {
+            return Optional.of(u);
         }
         return Optional.empty();
     }

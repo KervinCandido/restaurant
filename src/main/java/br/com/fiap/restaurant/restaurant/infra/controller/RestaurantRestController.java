@@ -2,8 +2,8 @@ package br.com.fiap.restaurant.restaurant.infra.controller;
 
 import br.com.fiap.restaurant.restaurant.core.controller.RestaurantController;
 import br.com.fiap.restaurant.restaurant.infra.controller.mapper.RestaurantRestMapper;
+import br.com.fiap.restaurant.restaurant.infra.controller.request.RestaurantRequest;
 import br.com.fiap.restaurant.restaurant.infra.controller.response.RestaurantResponse;
-import br.com.fiap.restaurant.restaurant.infra.controller.resquest.RestaurantRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

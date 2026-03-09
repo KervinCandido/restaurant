@@ -3,7 +3,7 @@ package br.com.fiap.restaurant.restaurant.core.controller;
 import br.com.fiap.restaurant.restaurant.core.inbound.CreateRestaurantInput;
 import br.com.fiap.restaurant.restaurant.core.outbound.RestaurantManagementOutput;
 import br.com.fiap.restaurant.restaurant.core.presenter.RestaurantPresenter;
-import br.com.fiap.restaurant.restaurant.core.usecase.CreateRestaurantUseCase;
+import br.com.fiap.restaurant.restaurant.core.usecase.restaurant.CreateRestaurantUseCase;
 
 import java.util.Objects;
 
