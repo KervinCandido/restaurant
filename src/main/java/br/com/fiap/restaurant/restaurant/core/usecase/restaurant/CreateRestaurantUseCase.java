@@ -1,4 +1,4 @@
-package br.com.fiap.restaurant.restaurant.core.usecase;
+package br.com.fiap.restaurant.restaurant.core.usecase.restaurant;
 
 import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
@@ -54,20 +54,23 @@ public class CreateRestaurantUseCase {
         User owner = userGateway.findById(input.ownerId())
                 .orElseThrow(() -> new UserNotFoundException(input.ownerId()));
 
-        List<User> employees = userGateway.findAllById(input.employees());
-
-        if (employees.size() != input.employees().size()) {
-            var uuids = employees.stream().map(User::getUuid).toList();
-            var notFoundEmployees = input.employees().stream().filter(e -> !uuids.contains(e)).toList();
-            throw new UserNotFoundException("employee(s) not found " + notFoundEmployees);
-        }
 
         Restaurant restaurant = new Restaurant(null, input.name(), address, input.cuisineType(), owner);
 
+        if (input.employees() != null) {
+            List<User> employees = userGateway.findAllById(input.employees());
+
+            if (employees.size() != input.employees().size()) {
+                var uuids = employees.stream().map(User::getUuid).toList();
+                var notFoundEmployees = input.employees().stream().filter(e -> !uuids.contains(e)).toList();
+                throw new UserNotFoundException("employee(s) not found " + notFoundEmployees);
+            }
+
+            employees.forEach(restaurant::addEmployee);
+        }
+
         var openingHoursInputs = Optional.ofNullable(input.openingHours());
         var menu = Optional.ofNullable(input.menu());
-
-        employees.forEach(restaurant::addEmployee);
 
         openingHoursInputs.stream()
                 .flatMap(o -> o.stream()

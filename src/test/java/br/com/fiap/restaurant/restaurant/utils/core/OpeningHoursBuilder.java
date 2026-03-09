@@ -2,6 +2,7 @@ package br.com.fiap.restaurant.restaurant.utils.core;
 
 import br.com.fiap.restaurant.restaurant.core.domain.valueobject.OpeningHours;
 import br.com.fiap.restaurant.restaurant.core.inbound.OpeningHoursInput;
+import br.com.fiap.restaurant.restaurant.core.inbound.UpdateOpeningHoursInput;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -61,5 +62,9 @@ public class OpeningHoursBuilder {
 
     public OpeningHoursInput buildInput() {
         return new OpeningHoursInput(dayOfWeek, openHour, closeHour);
+    }
+
+    public UpdateOpeningHoursInput buildUpdateInput() {
+        return new UpdateOpeningHoursInput(id, dayOfWeek, openHour, closeHour);
     }
 }

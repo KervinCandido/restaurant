@@ -3,11 +3,6 @@ package br.com.fiap.restaurant.restaurant.infra.persistence.mapper;
 import br.com.fiap.restaurant.restaurant.core.domain.valueobject.OpeningHours;
 import br.com.fiap.restaurant.restaurant.infra.persistence.entity.OpeningHoursEntity;
 import br.com.fiap.restaurant.restaurant.infra.persistence.entity.RestaurantEntity;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
-import java.time.DayOfWeek;
-import java.time.LocalTime;
 
 public class OpeningHoursMapper {
 

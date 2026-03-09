@@ -1,4 +1,4 @@
-package br.com.fiap.restaurant.restaurant.infra.controller.resquest;
+package br.com.fiap.restaurant.restaurant.infra.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;

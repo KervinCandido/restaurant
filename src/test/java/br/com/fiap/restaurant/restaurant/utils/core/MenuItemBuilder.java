@@ -2,6 +2,7 @@ package br.com.fiap.restaurant.restaurant.utils.core;
 
 import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.inbound.MenuItemInput;
+import br.com.fiap.restaurant.restaurant.core.inbound.UpdateMenuItemInput;
 
 import java.math.BigDecimal;
 
@@ -77,5 +78,9 @@ public class MenuItemBuilder {
 
     public MenuItemInput buildInput() {
         return new MenuItemInput(name, description, price, restaurantOnly, photoPath);
+    }
+
+    public UpdateMenuItemInput buildUpdateInput() {
+        return new UpdateMenuItemInput(id, name, description, price, restaurantOnly, photoPath);
     }
 }
