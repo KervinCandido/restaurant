@@ -20,7 +20,6 @@ import java.util.UUID;
 public class UserEntity implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
     @ElementCollection(fetch = FetchType.EAGER)

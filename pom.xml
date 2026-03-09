@@ -22,6 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <springdoc.version>3.0.1</springdoc.version>
     </properties>
 
     <dependencies>
@@ -110,6 +111,12 @@
             <artifactId>assertj-core</artifactId>
             <version>3.27.7</version>
             <scope>test</scope>
+        </dependency>
+        <!-- Swagger / OpenAPI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
     </dependencies>
 

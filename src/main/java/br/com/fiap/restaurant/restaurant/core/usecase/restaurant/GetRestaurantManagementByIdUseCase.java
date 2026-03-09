@@ -22,7 +22,7 @@ public class GetRestaurantManagementByIdUseCase {
         this.restaurantGateway = Objects.requireNonNull(restaurantGateway, "RestaurantGateway cannot be null.");
     }
 
-    protected Optional<Restaurant> execute(Long restaurantId) {
+    public Optional<Restaurant> execute(Long restaurantId) {
         Objects.requireNonNull(restaurantId, "restaurantId cannot be null.");
 
         if (!loggedUserGateway.hasRole(Restaurant.VIEW_RESTAURANT_MANAGEMENT)) {

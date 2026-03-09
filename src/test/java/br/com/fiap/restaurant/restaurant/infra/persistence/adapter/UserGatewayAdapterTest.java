@@ -80,4 +80,17 @@ class UserGatewayAdapterTest {
         assertThat(result).hasSize(2);
         assertThat(result).extracting(User::getUuid).containsExactlyInAnyOrder(entity1.getUuid(), entity2.getUuid());
     }
+
+    @Test
+    @DisplayName("Deve retornar vazio se os ids forem vazios")
+    void deveRetornarVazioSeOsIdsForemVazios() {
+        // Given
+        List<UUID> ids = List.of();
+
+        // When
+        List<User> result = adapter.findAllById(ids);
+
+        // Then
+        assertThat(result).isNotNull().isEmpty();
+    }
 }

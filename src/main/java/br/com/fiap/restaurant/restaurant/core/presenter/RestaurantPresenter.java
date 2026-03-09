@@ -3,6 +3,9 @@ package br.com.fiap.restaurant.restaurant.core.presenter;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
 import br.com.fiap.restaurant.restaurant.core.outbound.RestaurantManagementOutput;
+import br.com.fiap.restaurant.restaurant.core.outbound.RestaurantPublicOutput;
+
+import java.util.stream.Collectors;
 
 public class RestaurantPresenter {
 
@@ -24,6 +27,17 @@ public class RestaurantPresenter {
                 openingHours,
                 menu,
                 employees
+        );
+    }
+
+    public static RestaurantPublicOutput toOutput(Restaurant restaurant) {
+        return new RestaurantPublicOutput(
+                restaurant.getId(),
+                restaurant.getName(),
+                AddressPresenter.toOutput(restaurant.getAddress()),
+                restaurant.getCuisineType(),
+                restaurant.getOpeningHours().stream().map(OpeningHoursPresenter::toOutput).collect(Collectors.toSet()),
+                restaurant.getMenuItems().stream().map(MenuItemPresenter::toOutput).collect(Collectors.toSet())
         );
     }
 }

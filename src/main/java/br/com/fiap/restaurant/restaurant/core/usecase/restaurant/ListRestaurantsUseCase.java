@@ -14,7 +14,7 @@ public class ListRestaurantsUseCase {
         this.restaurantGateway = Objects.requireNonNull(restaurantGateway, "RestaurantGateway cannot be null.");
     }
 
-    protected List<Restaurant> execute() {
+    public List<Restaurant> execute() {
         return restaurantGateway.findAll();
     }
 

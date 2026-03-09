@@ -25,6 +25,7 @@ public class UserGatewayAdapter implements UserGateway {
 
     @Override
     public List<User> findAllById(Collection<UUID> uuids) {
+        if (uuids.isEmpty()) return List.of();
         return userRepository.findAllById(uuids).stream().map(UserMapper::toDomain).toList();
     }
 }
