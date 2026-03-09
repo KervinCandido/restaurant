@@ -26,4 +26,11 @@ class AddressPresenterTest {
         assertThat(output.zipCode()).isEqualTo(address.getZipCode());
         assertThat(output.complement()).isEqualTo(address.getComplement());
     }
+
+    @DisplayName("Deve retornar nulo se o address for nulo")
+    @Test
+    void deveRetornarNullSeForNulo() {
+        AddressOutput output = AddressPresenter.toOutput(null);
+        assertThat(output).isNull();
+    }
 }

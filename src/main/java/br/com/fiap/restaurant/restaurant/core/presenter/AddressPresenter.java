@@ -9,6 +9,6 @@ public class AddressPresenter {
     private AddressPresenter() {}
 
     public static AddressOutput toOutput(Address address) {
-        return new AddressOutput(address.getStreet(), address.getNumber(), address.getCity(), address.getState(), address.getZipCode(), address.getComplement());
+        return address == null ? null : new AddressOutput(address.getStreet(), address.getNumber(), address.getCity(), address.getState(), address.getZipCode(), address.getComplement());
     }
 }

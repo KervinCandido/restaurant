@@ -61,5 +61,26 @@ public class CoreUseCaseConfig {
     ListRestaurantsPagedUseCase listRestaurantsPagedUseCase(RestaurantGateway restaurantGateway) {
         return new ListRestaurantsPagedUseCase(restaurantGateway);
     }
+
+    @Bean
+    public RestaurantUseCaseFacade restaurantUseCaseFacade(CreateRestaurantUseCase createRestaurantUseCase,
+                                                           UpdateRestaurantUseCase updateRestaurantUseCase,
+                                                           GetRestaurantByIdUseCase getRestaurantByIdUseCase,
+                                                           ListRestaurantsUseCase listRestaurantsUseCase,
+                                                           DeleteRestaurantUseCase deleteRestaurantUseCase,
+                                                           ListRestaurantsByCuisineTypeUseCase listRestaurantsByCuisineTypeUseCase,
+                                                           GetRestaurantManagementByIdUseCase getRestaurantManagementByIdUseCase,
+                                                           ListRestaurantsPagedUseCase listRestaurantsPagedUseCase){
+        return new RestaurantUseCaseFacade.Builder()
+                .createRestaurantUseCase(createRestaurantUseCase)
+                .updateRestaurantUseCase(updateRestaurantUseCase)
+                .getRestaurantByIdUseCase(getRestaurantByIdUseCase)
+                .getRestaurantManagementByIdUseCase(getRestaurantManagementByIdUseCase)
+                .deleteRestaurantUseCase(deleteRestaurantUseCase)
+                .listRestaurantsUseCase(listRestaurantsUseCase)
+                .listRestaurantsByCuisineTypeUseCase(listRestaurantsByCuisineTypeUseCase)
+                .listRestaurantsPagedUseCase(listRestaurantsPagedUseCase)
+                .build();
+    }
 }
 

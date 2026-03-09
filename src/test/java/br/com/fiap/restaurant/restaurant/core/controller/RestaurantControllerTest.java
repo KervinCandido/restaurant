@@ -35,28 +35,7 @@ import static org.mockito.BDDMockito.*;
 class RestaurantControllerTest {
 
     @Mock
-    private CreateRestaurantUseCase createRestaurantUseCase;
-
-    @Mock
-    private UpdateRestaurantUseCase updateRestaurantUseCase;
-
-    @Mock
-    private GetRestaurantByIdUseCase getRestaurantByIdUseCase;
-
-    @Mock
-    private ListRestaurantsUseCase listRestaurantsUseCase;
-
-    @Mock
-    private DeleteRestaurantUseCase deleteRestaurantUseCase;
-
-    @Mock
-    private ListRestaurantsByCuisineTypeUseCase listRestaurantsByCuisineTypeUseCase;
-
-    @Mock
-    private GetRestaurantManagementByIdUseCase getRestaurantManagementByIdUseCase;
-
-    @Mock
-    private ListRestaurantsPagedUseCase listRestaurantsPagedUseCase;
+    private RestaurantUseCaseFacade restaurantUseCaseFacade;
 
     @InjectMocks
     private RestaurantController restaurantController;
@@ -137,7 +116,7 @@ class RestaurantControllerTest {
         restaurant.addMenuItem(menuItem);
         restaurant.addEmployee(employee);
 
-        given(createRestaurantUseCase.execute(input)).willReturn(restaurant);
+        given(restaurantUseCaseFacade.createRestaurant(input)).willReturn(restaurant);
 
         // Act
         RestaurantManagementOutput result = restaurantController.createRestaurant(input);
@@ -151,7 +130,7 @@ class RestaurantControllerTest {
         assertThat(result.openingHours()).isNotNull().hasSize(1).containsExactlyInAnyOrder(openingHoursOutput);
         assertThat(result.menu()).isNotNull().hasSize(1).containsExactlyInAnyOrder(menuOutput);
 
-        then(createRestaurantUseCase).should().execute(createRestaurantInputCaptor.capture());
+        then(restaurantUseCaseFacade).should().createRestaurant(createRestaurantInputCaptor.capture());
         CreateRestaurantInput capturedInput = createRestaurantInputCaptor.getValue();
         assertThat(capturedInput).isNotNull();
         assertThat(capturedInput).usingRecursiveComparison().isEqualTo(input);
@@ -171,109 +150,13 @@ class RestaurantControllerTest {
         );
         RuntimeException expectedException = new RuntimeException("Error creating restaurant");
 
-        given(createRestaurantUseCase.execute(input)).willThrow(expectedException);
+        given(restaurantUseCaseFacade.createRestaurant(input)).willThrow(expectedException);
 
         assertThatThrownBy(() -> restaurantController.createRestaurant(input))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Error creating restaurant");
 
-        then(createRestaurantUseCase).should().execute(input);
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao instanciar controller com CreateRestaurantUseCase nulo")
-    void shouldThrowExceptionWhenCreateUseCaseIsNull() {
-        assertThatThrownBy(() -> new RestaurantController(
-                null,
-                updateRestaurantUseCase,
-                getRestaurantByIdUseCase,
-                listRestaurantsUseCase,
-                deleteRestaurantUseCase,
-                listRestaurantsByCuisineTypeUseCase,
-                getRestaurantManagementByIdUseCase,
-                listRestaurantsPagedUseCase))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("CreateRestaurantUseCase cannot be null.");
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao instanciar controller com UpdateRestaurantUseCase nulo")
-    void shouldThrowExceptionWhenUpdateUseCaseIsNull() {
-        assertThatThrownBy(() -> new RestaurantController(
-                createRestaurantUseCase,
-                null,
-                getRestaurantByIdUseCase,
-                listRestaurantsUseCase,
-                deleteRestaurantUseCase,
-                listRestaurantsByCuisineTypeUseCase,
-                getRestaurantManagementByIdUseCase,
-                listRestaurantsPagedUseCase))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("UpdateRestaurantUseCase cannot be null.");
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao instanciar controller com GetByIdRestaurantUseCase nulo")
-    void shouldThrowExceptionWhenGetByIdUseCaseIsNull() {
-        assertThatThrownBy(() -> new RestaurantController(
-                createRestaurantUseCase,
-                updateRestaurantUseCase,
-                null,
-                listRestaurantsUseCase,
-                deleteRestaurantUseCase,
-                listRestaurantsByCuisineTypeUseCase,
-                getRestaurantManagementByIdUseCase,
-                listRestaurantsPagedUseCase))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("GetByIdRestaurantUseCase cannot be null.");
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao instanciar controller com GetAllRestaurantUseCase nulo")
-    void shouldThrowExceptionWhenGetAllUseCaseIsNull() {
-        assertThatThrownBy(() -> new RestaurantController(
-                createRestaurantUseCase,
-                updateRestaurantUseCase,
-                getRestaurantByIdUseCase,
-                null,
-                deleteRestaurantUseCase,
-                listRestaurantsByCuisineTypeUseCase,
-                getRestaurantManagementByIdUseCase,
-                listRestaurantsPagedUseCase))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("GetAllRestaurantUseCase cannot be null.");
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao instanciar controller com DeleteRestaurantUseCase nulo")
-    void shouldThrowExceptionWhenDeleteUseCaseIsNull() {
-        assertThatThrownBy(() -> new RestaurantController(
-                createRestaurantUseCase,
-                updateRestaurantUseCase,
-                getRestaurantByIdUseCase,
-                listRestaurantsUseCase,
-                null,
-                listRestaurantsByCuisineTypeUseCase,
-                getRestaurantManagementByIdUseCase,
-                listRestaurantsPagedUseCase))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("DeleteRestaurantUseCase cannot be null.");
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao instanciar controller com ListRestaurantsByCuisineTypeUseCase nulo")
-    void shouldThrowExceptionWhenListByCuisineTypeUseCaseIsNull() {
-        assertThatThrownBy(() -> new RestaurantController(
-                createRestaurantUseCase,
-                updateRestaurantUseCase,
-                getRestaurantByIdUseCase,
-                listRestaurantsUseCase,
-                deleteRestaurantUseCase,
-                null,
-                getRestaurantManagementByIdUseCase,
-                listRestaurantsPagedUseCase))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("ListRestaurantsByCuisineTypeUseCase cannot be null.");
+        then(restaurantUseCaseFacade).should().createRestaurant(input);
     }
 
     @Test
@@ -300,7 +183,7 @@ class RestaurantControllerTest {
 
         restaurantController.updateRestaurant(input);
 
-        then(updateRestaurantUseCase).should().execute(updateRestaurantInputCaptor.capture());
+        then(restaurantUseCaseFacade).should().updateRestaurant(updateRestaurantInputCaptor.capture());
         UpdateRestaurantInput capturedInput = updateRestaurantInputCaptor.getValue();
         assertThat(capturedInput).usingRecursiveComparison().isEqualTo(input);
     }
@@ -320,13 +203,13 @@ class RestaurantControllerTest {
         );
         RuntimeException expectedException = new RuntimeException("Error updating restaurant");
 
-        willThrow(expectedException).given(updateRestaurantUseCase).execute(input);
+        willThrow(expectedException).given(restaurantUseCaseFacade).updateRestaurant(input);
 
         assertThatThrownBy(() -> restaurantController.updateRestaurant(input))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Error updating restaurant");
 
-        then(updateRestaurantUseCase).should().execute(input);
+        then(restaurantUseCaseFacade).should().updateRestaurant(input);
     }
 
     @Test
@@ -351,7 +234,7 @@ class RestaurantControllerTest {
         restaurant.addMenuItem(menuItem);
         restaurant.addEmployee(employee);
 
-        given(getRestaurantByIdUseCase.execute(restaurantId)).willReturn(Optional.of(restaurant));
+        given(restaurantUseCaseFacade.findById(restaurantId)).willReturn(Optional.of(restaurant));
 
         var optionalResult = restaurantController.findById(restaurantId);
 
@@ -363,7 +246,7 @@ class RestaurantControllerTest {
         assertThat(result.openingHours()).isNotNull().hasSize(1);
         assertThat(result.menuItems()).isNotNull().hasSize(1);
 
-        then(getRestaurantByIdUseCase).should().execute(restaurantId);
+        then(restaurantUseCaseFacade).should().findById(restaurantId);
     }
 
     @Test
@@ -372,13 +255,13 @@ class RestaurantControllerTest {
         Long id = 1L;
         RuntimeException expectedException = new RuntimeException("Restaurant not found");
 
-        given(getRestaurantByIdUseCase.execute(id)).willThrow(expectedException);
+        given(restaurantUseCaseFacade.findById(id)).willThrow(expectedException);
 
-        assertThatThrownBy(() -> restaurantController.findById(id))
+        assertThatThrownBy(() -> restaurantUseCaseFacade.findById(id))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Restaurant not found");
 
-        then(getRestaurantByIdUseCase).should().execute(id);
+        then(restaurantUseCaseFacade).should().findById(id);
     }
 
     @Test
@@ -403,7 +286,7 @@ class RestaurantControllerTest {
         restaurant.addMenuItem(menuItem);
         restaurant.addEmployee(employee);
 
-        given(listRestaurantsUseCase.execute()).willReturn(List.of(restaurant));
+        given(restaurantUseCaseFacade.findAll()).willReturn(List.of(restaurant));
 
         List<RestaurantPublicOutput> result = restaurantController.findAll();
 
@@ -415,19 +298,19 @@ class RestaurantControllerTest {
         assertThat(output.openingHours()).isNotNull().hasSize(1);
         assertThat(output.menuItems()).isNotNull().hasSize(1);
 
-        then(listRestaurantsUseCase).should().execute();
+        then(restaurantUseCaseFacade).should().findAll();
     }
 
     @Test
     @DisplayName("Deve retornar lista vazia quando não houver restaurantes")
     void shouldReturnEmptyListWhenNoRestaurantsFound() {
-        given(listRestaurantsUseCase.execute()).willReturn(Collections.emptyList());
+        given(restaurantUseCaseFacade.findAll()).willReturn(Collections.emptyList());
 
         List<RestaurantPublicOutput> result = restaurantController.findAll();
 
         assertThat(result).isNotNull().isEmpty();
 
-        then(listRestaurantsUseCase).should().execute();
+        then(restaurantUseCaseFacade).should().findAll();
     }
 
     @Test
@@ -448,7 +331,7 @@ class RestaurantControllerTest {
 
         Page<Restaurant> restaurantPage = new Page<>(pageNumber, pageSize, 1L, List.of(restaurant));
 
-        given(listRestaurantsPagedUseCase.execute(any(PagedQuery.class))).willReturn(restaurantPage);
+        given(restaurantUseCaseFacade.findAll(any(PagedQuery.class))).willReturn(restaurantPage);
 
         Page<RestaurantPublicOutput> result = restaurantController.findAll(pageNumber, pageSize);
 
@@ -464,7 +347,7 @@ class RestaurantControllerTest {
         assertThat(output.name()).isEqualTo(restaurant.getName());
         assertThat(output.cuisineType()).isEqualTo(restaurant.getCuisineType());
 
-        then(listRestaurantsPagedUseCase).should().execute(pagedQueryVoidCaptor.capture());
+        then(restaurantUseCaseFacade).should().findAll(pagedQueryVoidCaptor.capture());
         PagedQuery<Void> capturedQuery = pagedQueryVoidCaptor.getValue();
         assertThat(capturedQuery.pageNumber()).isEqualTo(pageNumber);
         assertThat(capturedQuery.pageSize()).isEqualTo(pageSize);
@@ -477,7 +360,7 @@ class RestaurantControllerTest {
         int pageSize = 10;
         Page<Restaurant> emptyPage = new Page<>(pageNumber, pageSize, 0L, List.of());
 
-        given(listRestaurantsPagedUseCase.execute(any(PagedQuery.class))).willReturn(emptyPage);
+        given(restaurantUseCaseFacade.findAll(any(PagedQuery.class))).willReturn(emptyPage);
 
         Page<RestaurantPublicOutput> result = restaurantController.findAll(pageNumber, pageSize);
 
@@ -487,7 +370,7 @@ class RestaurantControllerTest {
         assertThat(result.totalElements()).isZero();
         assertThat(result.content()).isEmpty();
 
-        then(listRestaurantsPagedUseCase).should().execute(any(PagedQuery.class));
+        then(restaurantUseCaseFacade).should().findAll(any(PagedQuery.class));
     }
 
     @Test
@@ -511,7 +394,7 @@ class RestaurantControllerTest {
 
         Page<Restaurant> restaurantPage = new Page<>(pageNumber, pageSize, 1L, List.of(restaurant));
 
-        given(listRestaurantsByCuisineTypeUseCase.execute(pagedQuery)).willReturn(restaurantPage);
+        given(restaurantUseCaseFacade.findByCuisineType(pagedQuery)).willReturn(restaurantPage);
 
         Page<RestaurantPublicOutput> result = restaurantController.findByCuisineType(cuisineType, pageNumber, pageSize);
 
@@ -528,7 +411,7 @@ class RestaurantControllerTest {
         assertThat(output.openingHours()).containsExactlyInAnyOrder(openingHoursOutput);
         assertThat(output.menuItems()).containsExactlyInAnyOrder(menuOutput);
 
-        then(listRestaurantsByCuisineTypeUseCase).should().execute(pagedQueryCaptor.capture());
+        then(restaurantUseCaseFacade).should().findByCuisineType(pagedQueryCaptor.capture());
         assertThat(pagedQueryCaptor.getValue()).usingRecursiveComparison().isEqualTo(pagedQuery);
     }
 
@@ -542,7 +425,7 @@ class RestaurantControllerTest {
         var pagedQuery = new PagedQuery<>(cuisineType, pageNumber, pageSize);
         Page<Restaurant> emptyPage = new Page<>(pageNumber, pageSize, 0L, List.of());
 
-        given(listRestaurantsByCuisineTypeUseCase.execute(pagedQuery)).willReturn(emptyPage);
+        given(restaurantUseCaseFacade.findByCuisineType(pagedQuery)).willReturn(emptyPage);
 
         Page<RestaurantPublicOutput> result = restaurantController.findByCuisineType(cuisineType, pageNumber, pageSize);
 
@@ -553,7 +436,7 @@ class RestaurantControllerTest {
         assertThat(result.totalPages()).isZero();
         assertThat(result.content()).isEmpty();
 
-        then(listRestaurantsByCuisineTypeUseCase).should().execute(pagedQuery);
+        then(restaurantUseCaseFacade).should().findByCuisineType(pagedQuery);
     }
 
     @Test
@@ -563,7 +446,7 @@ class RestaurantControllerTest {
 
         restaurantController.deleteById(id);
 
-        then(deleteRestaurantUseCase).should().execute(id);
+        then(restaurantUseCaseFacade).should().deleteById(id);
     }
 
     @Test
@@ -580,30 +463,13 @@ class RestaurantControllerTest {
         Long id = 1L;
         RuntimeException expectedException = new RuntimeException("Error deleting restaurant");
 
-        willThrow(expectedException).given(deleteRestaurantUseCase).execute(id);
+        willThrow(expectedException).given(restaurantUseCaseFacade).deleteById(id);
 
         assertThatThrownBy(() -> restaurantController.deleteById(id))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Error deleting restaurant");
 
-        then(deleteRestaurantUseCase).should().execute(id);
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao instanciar controller com GetRestaurantManagementByIdUseCase nulo")
-    void shouldThrowExceptionWhenGetRestaurantManagementByIdUseCaseIsNull() {
-        assertThatThrownBy(() -> new RestaurantController(
-                createRestaurantUseCase,
-                updateRestaurantUseCase,
-                getRestaurantByIdUseCase,
-                listRestaurantsUseCase,
-                deleteRestaurantUseCase,
-                listRestaurantsByCuisineTypeUseCase,
-                null,
-                listRestaurantsPagedUseCase)
-        )
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("GetRestaurantManagementByIdUseCase cannot be null.");
+        then(restaurantUseCaseFacade).should().deleteById(id);
     }
 
     @Test
@@ -620,7 +486,7 @@ class RestaurantControllerTest {
         );
         restaurant.addEmployee(new User(UUID.randomUUID(), Set.of(Restaurant.VIEW_RESTAURANT)));
 
-        given(getRestaurantManagementByIdUseCase.execute(id)).willReturn(Optional.of(restaurant));
+        given(restaurantUseCaseFacade.findManagementById(id)).willReturn(Optional.of(restaurant));
 
         var result = restaurantController.findManagementById(id);
 
@@ -628,7 +494,7 @@ class RestaurantControllerTest {
         assertThat(result.get().id()).isEqualTo(id);
         assertThat(result.get().employees()).isNotNull().hasSize(1);
 
-        then(getRestaurantManagementByIdUseCase).should().execute(id);
+        then(restaurantUseCaseFacade).should().findManagementById(id);
     }
 
     @Test
