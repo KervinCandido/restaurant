@@ -34,6 +34,7 @@ class UserGatewayAdapterTest {
     void deveEncontrarUsuarioPorId() {
         // Given
         UserEntity entity = new UserEntity();
+        entity.setUuid(UUID.randomUUID());
         entity.setRoles(Set.of("CUSTOMER"));
         entity = userRepository.save(entity);
 
@@ -64,10 +65,12 @@ class UserGatewayAdapterTest {
     void deveEncontrarTodosUsuariosPorIds() {
         // Given
         UserEntity entity1 = new UserEntity();
+        entity1.setUuid(UUID.randomUUID());
         entity1.setRoles(Set.of("CUSTOMER"));
-        entity1 = userRepository.save(entity1);
+        userRepository.save(entity1);
 
         UserEntity entity2 = new UserEntity();
+        entity2.setUuid(UUID.randomUUID());
         entity2.setRoles(Set.of("ADMIN"));
         entity2 = userRepository.save(entity2);
 

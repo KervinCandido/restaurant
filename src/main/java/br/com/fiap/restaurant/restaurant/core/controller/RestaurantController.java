@@ -7,7 +7,7 @@ import br.com.fiap.restaurant.restaurant.core.inbound.UpdateRestaurantInput;
 import br.com.fiap.restaurant.restaurant.core.outbound.RestaurantManagementOutput;
 import br.com.fiap.restaurant.restaurant.core.outbound.RestaurantPublicOutput;
 import br.com.fiap.restaurant.restaurant.core.presenter.RestaurantPresenter;
-import br.com.fiap.restaurant.restaurant.core.usecase.restaurant.*;
+import br.com.fiap.restaurant.restaurant.core.usecase.restaurant.RestaurantUseCaseFacade;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,88 +15,59 @@ import java.util.Optional;
 
 public class RestaurantController {
 
-    private static final String ID_CANNOT_BE_NULL = "Restaurant Id cannot be null.";
+    private static final String RESTAURANT_ID_CANNOT_BE_NULL = "Restaurant Id cannot be null.";
 
-    private final CreateRestaurantUseCase createRestaurantUseCase;
-    private final UpdateRestaurantUseCase updateRestaurantUseCase;
-    private final GetRestaurantByIdUseCase getRestaurantByIdUseCase;
-    private final ListRestaurantsUseCase listRestaurantsUseCase;
-    private final DeleteRestaurantUseCase deleteRestaurantUseCase;
-    private final ListRestaurantsByCuisineTypeUseCase listRestaurantsByCuisineTypeUseCase;
-    private final GetRestaurantManagementByIdUseCase getRestaurantManagementByIdUseCase;
-    private final ListRestaurantsPagedUseCase listRestaurantsPagedUseCase;
+    private final RestaurantUseCaseFacade useCases;
 
-    public RestaurantController(CreateRestaurantUseCase createRestaurantUseCase,
-                                UpdateRestaurantUseCase updateRestaurantUseCase,
-                                GetRestaurantByIdUseCase getRestaurantByIdUseCase,
-                                ListRestaurantsUseCase listRestaurantsUseCase,
-                                DeleteRestaurantUseCase deleteRestaurantUseCase,
-                                ListRestaurantsByCuisineTypeUseCase listRestaurantsByCuisineTypeUseCase,
-                                GetRestaurantManagementByIdUseCase getRestaurantManagementByIdUseCase,
-                                ListRestaurantsPagedUseCase listRestaurantsPagedUseCase) {
-        Objects.requireNonNull(createRestaurantUseCase, "CreateRestaurantUseCase cannot be null.");
-        Objects.requireNonNull(updateRestaurantUseCase, "UpdateRestaurantUseCase cannot be null.");
-        Objects.requireNonNull(getRestaurantByIdUseCase, "GetByIdRestaurantUseCase cannot be null.");
-        Objects.requireNonNull(listRestaurantsUseCase, "GetAllRestaurantUseCase cannot be null.");
-        Objects.requireNonNull(deleteRestaurantUseCase, "DeleteRestaurantUseCase cannot be null.");
-        Objects.requireNonNull(listRestaurantsByCuisineTypeUseCase, "ListRestaurantsByCuisineTypeUseCase cannot be null.");
-        Objects.requireNonNull(getRestaurantManagementByIdUseCase, "GetRestaurantManagementByIdUseCase cannot be null.");
-        Objects.requireNonNull(listRestaurantsPagedUseCase, "ListRestaurantsPagedUseCase cannot be null.");
-        this.createRestaurantUseCase = createRestaurantUseCase;
-        this.updateRestaurantUseCase = updateRestaurantUseCase;
-        this.getRestaurantByIdUseCase = getRestaurantByIdUseCase;
-        this.listRestaurantsUseCase = listRestaurantsUseCase;
-        this.deleteRestaurantUseCase = deleteRestaurantUseCase;
-        this.listRestaurantsByCuisineTypeUseCase = listRestaurantsByCuisineTypeUseCase;
-        this.getRestaurantManagementByIdUseCase = getRestaurantManagementByIdUseCase;
-        this.listRestaurantsPagedUseCase = listRestaurantsPagedUseCase;
+    public RestaurantController(RestaurantUseCaseFacade useCases) {
+        this.useCases = Objects.requireNonNull(useCases, "RestaurantUseCaseFacade cannot be null.");
     }
 
     public RestaurantManagementOutput createRestaurant(CreateRestaurantInput createRestaurantInput) {
         Objects.requireNonNull(createRestaurantInput, "CreateRestaurantInput cannot be null.");
-        var restaurant = createRestaurantUseCase.execute(createRestaurantInput);
+        var restaurant = useCases.createRestaurant(createRestaurantInput);
         return RestaurantPresenter.toManagementOutput(restaurant);
     }
 
     public void updateRestaurant(UpdateRestaurantInput updateRestaurantInput) {
         Objects.requireNonNull(updateRestaurantInput, "UpdateRestaurantInput cannot be null.");
-        updateRestaurantUseCase.execute(updateRestaurantInput);
+        useCases.updateRestaurant(updateRestaurantInput);
     }
 
-    public Optional<RestaurantPublicOutput> findById(Long id) {
-        Objects.requireNonNull(id, ID_CANNOT_BE_NULL);
-        var restaurant = getRestaurantByIdUseCase.execute(id);
+    public Optional<RestaurantPublicOutput> findById(Long restaurantId) {
+        Objects.requireNonNull(restaurantId, RESTAURANT_ID_CANNOT_BE_NULL);
+        var restaurant = useCases.findById(restaurantId);
         return restaurant.map(RestaurantPresenter::toOutput);
     }
 
-    public Optional<RestaurantManagementOutput> findManagementById(Long id) {
-        Objects.requireNonNull(id, ID_CANNOT_BE_NULL);
-        var restaurant = getRestaurantManagementByIdUseCase.execute(id);
+    public Optional<RestaurantManagementOutput> findManagementById(Long restaurantId) {
+        Objects.requireNonNull(restaurantId, RESTAURANT_ID_CANNOT_BE_NULL);
+        var restaurant = useCases.findManagementById(restaurantId);
         return restaurant.map(RestaurantPresenter::toManagementOutput);
     }
 
     // Mantido por compatibilidade
     public List<RestaurantPublicOutput> findAll() {
-        return listRestaurantsUseCase.execute()
+        return useCases.findAll()
                 .stream()
                 .map(RestaurantPresenter::toOutput)
                 .toList();
     }
 
     public Page<RestaurantPublicOutput> findAll(int pageNumber, int pageSize) {
-        PagedQuery<Void> pagedQuery = new PagedQuery<>(null, pageNumber, pageSize);
-        var page = listRestaurantsPagedUseCase.execute(pagedQuery);
+        var pagedQuery = new PagedQuery<Void>(null, pageNumber, pageSize);
+        var page = useCases.findAll(pagedQuery);
         return page.mapItems(RestaurantPresenter::toOutput);
     }
 
     public Page<RestaurantPublicOutput> findByCuisineType(String cuisineType, int pageNumber, int pageSize) {
         var pagedQuery = new PagedQuery<>(cuisineType, pageNumber, pageSize);
-        var page = listRestaurantsByCuisineTypeUseCase.execute(pagedQuery);
+        var page = useCases.findByCuisineType(pagedQuery);
         return page.mapItems(RestaurantPresenter::toOutput);
     }
 
-    public void deleteById(Long id) {
-        Objects.requireNonNull(id, ID_CANNOT_BE_NULL);
-        deleteRestaurantUseCase.execute(id);
+    public void deleteById(Long restaurantId) {
+        Objects.requireNonNull(restaurantId, RESTAURANT_ID_CANNOT_BE_NULL);
+        useCases.deleteById(restaurantId);
     }
 }
