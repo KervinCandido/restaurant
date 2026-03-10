@@ -80,13 +80,6 @@ class MenuItemTest {
                 .hasMessageContaining("restaurantOnly não pode ser nula");
     }
 
-    @DisplayName("Deve lançar NullPointerException se photoPath for nulo")
-    @Test
-    void deveLancarNullPointerSePhotoPathForNulo() {
-        assertThatThrownBy(() -> new MenuItem(1L, "name", "desc", BigDecimal.TEN, false, null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessageContaining("photoPath não pode ser nulo");
-    }
 
     @DisplayName("Deve lançar BusinessException se name for vazio")
     @Test
@@ -94,14 +87,6 @@ class MenuItemTest {
         assertThatThrownBy(() -> new MenuItem(1L, "   ", "desc", BigDecimal.TEN, false, "path"))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("O nome do item não pode ser vazio");
-    }
-
-    @DisplayName("Deve lançar BusinessException se photoPath for vazio")
-    @Test
-    void deveLancarBusinessExceptionSePhotoPathForVazio() {
-        assertThatThrownBy(() -> new MenuItem(1L, "name", "desc", BigDecimal.TEN, false, "   "))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("O caminho da foto não pode ser vazio");
     }
 
     @DisplayName("Deve lançar BusinessException se price for menor ou igual a zero")

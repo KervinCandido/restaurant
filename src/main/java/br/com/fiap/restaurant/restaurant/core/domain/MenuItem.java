@@ -7,6 +7,11 @@ import java.util.Objects;
 
 public class MenuItem {
 
+    public static final String CREATE_MENU_ITEM = "CREATE_MENU_ITEM";
+    public static final String UPDATE_MENU_ITEM = "UPDATE_MENU_ITEM";
+    public static final String DELETE_MENU_ITEM = "DELETE_MENU_ITEM";
+    public static final String VIEW_MENU_ITEM = "VIEW_MENU_ITEM";
+
     private final Long id;
     private final String name;
     private final String description;
@@ -18,13 +23,9 @@ public class MenuItem {
         Objects.requireNonNull(name, "name não pode ser nulo.");
         Objects.requireNonNull(price, "price não pode ser nulo.");
         Objects.requireNonNull(restaurantOnly, "restaurantOnly não pode ser nula.");
-        Objects.requireNonNull(photoPath, "photoPath não pode ser nulo.");
 
         if (name.trim().isBlank()) {
             throw new BusinessException("O nome do item não pode ser vazio.");
-        }
-        if (photoPath.trim().isBlank()) {
-            throw new BusinessException("O caminho da foto não pode ser vazio.");
         }
         if (price.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException("O preço deve ser maior que zero.");
@@ -35,7 +36,7 @@ public class MenuItem {
         this.description = description != null ? description.strip() : null;
         this.price = price;
         this.restaurantOnly = restaurantOnly;
-        this.photoPath = photoPath.strip();
+        this.photoPath = photoPath != null && !photoPath.isBlank() ? photoPath.strip() : null;
     }
 
     public Long getId() {

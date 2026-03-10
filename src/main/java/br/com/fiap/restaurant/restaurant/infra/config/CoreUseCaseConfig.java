@@ -1,8 +1,10 @@
 package br.com.fiap.restaurant.restaurant.infra.config;
 
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.MenuItemGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.UserGateway;
+import br.com.fiap.restaurant.restaurant.core.usecase.menuitem.*;
 import br.com.fiap.restaurant.restaurant.core.usecase.restaurant.*;
 import br.com.fiap.restaurant.restaurant.infra.publisher.RestaurantCreatedPublisher;
 import org.springframework.context.annotation.Bean;
@@ -82,5 +84,36 @@ public class CoreUseCaseConfig {
                 .listRestaurantsPagedUseCase(listRestaurantsPagedUseCase)
                 .build();
     }
+
+    @Bean
+    CreateMenuItemUseCase createMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway, RestaurantGateway restaurantGateway) {
+        return new CreateMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway);
+    }
+
+    @Bean
+    DeleteMenuItemUseCase deleteMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway, RestaurantGateway restaurantGateway) {
+        return new DeleteMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway);
+    }
+
+    @Bean
+    GetAllMenuItemsByRestaurantUseCase getAllMenuItemsByRestaurantUseCase(MenuItemGateway menuItemGateway, RestaurantGateway restaurantGateway) {
+        return new GetAllMenuItemsByRestaurantUseCase(menuItemGateway, restaurantGateway);
+    }
+
+    @Bean
+    GetMenuItemByIdUseCase getMenuItemByIdUseCase(MenuItemGateway menuItemGateway) {
+        return new GetMenuItemByIdUseCase(menuItemGateway);
+    }
+
+    @Bean
+    ListMenuItemsByRestaurantUseCase listMenuItemsByRestaurantUseCase(MenuItemGateway menuItemGateway, RestaurantGateway restaurantGateway) {
+        return new ListMenuItemsByRestaurantUseCase(menuItemGateway, restaurantGateway);
+    }
+
+    @Bean
+    UpdateMenuItemUseCase updateMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway, RestaurantGateway restaurantGateway) {
+        return new UpdateMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway);
+    }
+
 }
 
