@@ -1,6 +1,7 @@
 package br.com.fiap.restaurant.restaurant.utils.core;
 
 import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
+import br.com.fiap.restaurant.restaurant.core.inbound.CreateMenuItemInput;
 import br.com.fiap.restaurant.restaurant.core.inbound.MenuItemInput;
 import br.com.fiap.restaurant.restaurant.core.inbound.UpdateMenuItemInput;
 
@@ -82,5 +83,9 @@ public class MenuItemBuilder {
 
     public UpdateMenuItemInput buildUpdateInput() {
         return new UpdateMenuItemInput(id, name, description, price, restaurantOnly, photoPath);
+    }
+
+    public CreateMenuItemInput buildCreateMenuInput(Long restaurantId) {
+        return new CreateMenuItemInput(name, description, price, restaurantOnly, photoPath, restaurantId);
     }
 }
