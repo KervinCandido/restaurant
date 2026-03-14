@@ -3,13 +3,12 @@ package br.com.fiap.restaurant.restaurant.infra.publisher;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
 import br.com.fiap.restaurant.restaurant.core.domain.valueobject.Address;
-import org.junit.jupiter.api.AfterEach;
+import br.com.fiap.restaurant.restaurant.infra.config.RabbitMQConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
@@ -50,8 +49,8 @@ class RestaurantCreatedPublisherTest {
 
         // Then
         verify(rabbitTemplate).convertAndSend(
-                "restaurant-exchange",
-                "novo-restaurant",
+                RabbitMQConfig.RESTAURANT_EXCHANGE,
+                RabbitMQConfig.RESTAURANT_CREATE_ROUTING_KEY,
                 restaurant
         );
         assertThat(future).isDone();
