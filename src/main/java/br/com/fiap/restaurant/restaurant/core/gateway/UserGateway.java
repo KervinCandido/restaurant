@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface UserGateway {
     Optional<User> findById(UUID uuid);
     List<User> findAllById(Collection<UUID> uuids);
+    void delete(UUID uuid);
+    User save(User user);
 }

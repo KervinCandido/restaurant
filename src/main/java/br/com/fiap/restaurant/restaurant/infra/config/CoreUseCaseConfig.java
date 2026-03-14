@@ -6,6 +6,9 @@ import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.UserGateway;
 import br.com.fiap.restaurant.restaurant.core.usecase.menuitem.*;
 import br.com.fiap.restaurant.restaurant.core.usecase.restaurant.*;
+import br.com.fiap.restaurant.restaurant.core.usecase.user.CreateUserUseCase;
+import br.com.fiap.restaurant.restaurant.core.usecase.user.DeleteUserUseCase;
+import br.com.fiap.restaurant.restaurant.core.usecase.user.UpdateUserUseCase;
 import br.com.fiap.restaurant.restaurant.infra.publisher.RestaurantCreatedPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -115,5 +118,19 @@ public class CoreUseCaseConfig {
         return new UpdateMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway);
     }
 
+    @Bean
+    CreateUserUseCase createUserUseCase(UserGateway userGateway) {
+        return new CreateUserUseCase(userGateway);
+    }
+
+    @Bean
+    UpdateUserUseCase updateUserUseCase(UserGateway userGateway) {
+        return new UpdateUserUseCase(userGateway);
+    }
+
+    @Bean
+    DeleteUserUseCase deleteUserUseCase(UserGateway userGateway) {
+        return new DeleteUserUseCase(userGateway);
+    }
 }
 

@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -95,5 +96,58 @@ class UserGatewayAdapterTest {
 
         // Then
         assertThat(result).isNotNull().isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve salvar um usuário")
+    void deveSalvarUmUsuario() {
+        // Given
+        User user = new User(UUID.randomUUID(), Set.of(User.RESTAURANT_OWNER));
+
+
+        // When
+        User savedUser = adapter.save(user);
+
+        // Then
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getUuid()).isEqualTo(user.getUuid());
+        Optional<UserEntity> found = userRepository.findById(user.getUuid());
+        assertThat(found).isPresent();
+        assertThat(found.get().getUuid()).isEqualTo(user.getUuid());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao salvar usuário nulo")
+    void deveLancarExcecaoAoSalvarUsuarioNulo() {
+        // Then
+        assertThatThrownBy(() -> adapter.save(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("user cannot be null");
+    }
+
+    @Test
+    @DisplayName("Deve deletar um usuário")
+    void deveDeletarUmUsuario() {
+        // Given
+        UserEntity entity = new UserEntity();
+        entity.setUuid(UUID.randomUUID());
+        entity.setRoles(Set.of(User.RESTAURANT_OWNER));
+        userRepository.save(entity);
+
+        // When
+        adapter.delete(entity.getUuid());
+
+        // Then
+        Optional<UserEntity> found = userRepository.findById(entity.getUuid());
+        assertThat(found).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao deletar usuário com ID nulo")
+    void deveLancarExcecaoAoDeletarUsuarioComIdNulo() {
+        // Then
+        assertThatThrownBy(() -> adapter.delete(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("userUuid cannot be null");
     }
 }
