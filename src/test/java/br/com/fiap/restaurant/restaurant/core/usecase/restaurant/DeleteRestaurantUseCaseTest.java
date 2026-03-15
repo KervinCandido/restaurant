@@ -6,6 +6,7 @@ import br.com.fiap.restaurant.restaurant.core.domain.valueobject.Address;
 import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +34,9 @@ class DeleteRestaurantUseCaseTest {
 
     @Mock
     private RestaurantGateway restaurantGateway;
+
+    @Mock
+    private PublisherGateway<Restaurant> deleteRestaurantPublisher;
 
     @InjectMocks
     private DeleteRestaurantUseCase deleteRestaurantUseCase;
@@ -62,6 +66,7 @@ class DeleteRestaurantUseCaseTest {
         then(restaurantGateway).should().findById(restaurantId);
         then(loggedUserGateway).should().requireCurrentUser();
         then(restaurantGateway).should().delete(restaurantId);
+        then(deleteRestaurantPublisher).should().publish(restaurant);
     }
 
     @Test
@@ -80,6 +85,7 @@ class DeleteRestaurantUseCaseTest {
         then(restaurantGateway).should().findById(restaurantId);
         then(loggedUserGateway).should().requireCurrentUser();
         then(restaurantGateway).should().delete(restaurantId);
+        then(deleteRestaurantPublisher).should().publish(restaurant);
     }
 
     @Test
@@ -98,6 +104,7 @@ class DeleteRestaurantUseCaseTest {
         then(restaurantGateway).should().findById(restaurantId);
         then(loggedUserGateway).should().requireCurrentUser();
         then(restaurantGateway).should(never()).delete(restaurantId);
+        then(deleteRestaurantPublisher).should(never()).publish(restaurant);
     }
 
     @Test
@@ -112,6 +119,8 @@ class DeleteRestaurantUseCaseTest {
         then(loggedUserGateway).should().hasRole(Restaurant.DELETE_RESTAURANT);
         then(restaurantGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should(never()).requireCurrentUser();
+        then(restaurantGateway).should(never()).delete(restaurantId);
+        then(deleteRestaurantPublisher).should(never()).publish(restaurant);
     }
 
     @Test
@@ -128,6 +137,7 @@ class DeleteRestaurantUseCaseTest {
         then(restaurantGateway).should().findById(restaurantId);
         then(loggedUserGateway).should(never()).requireCurrentUser();
         then(restaurantGateway).should(never()).delete(restaurantId);
+        then(deleteRestaurantPublisher).should(never()).publish(restaurant);
     }
 
     @Test
@@ -139,5 +149,6 @@ class DeleteRestaurantUseCaseTest {
 
         then(loggedUserGateway).shouldHaveNoInteractions();
         then(restaurantGateway).shouldHaveNoInteractions();
+        then(deleteRestaurantPublisher).shouldHaveNoInteractions();
     }
 }

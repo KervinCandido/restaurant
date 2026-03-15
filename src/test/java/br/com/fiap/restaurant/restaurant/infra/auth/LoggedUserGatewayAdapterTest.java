@@ -120,14 +120,16 @@ class LoggedUserGatewayAdapterTest {
     }
 
     @Test
-    @DisplayName("Deve retornar usuário atual se autenticado e principal for UserEntity")
-    void deveRetornarUsuarioAtualSeAutenticadoEPrincipalForUserEntity() {
+    @DisplayName("Deve retornar usuário atual reconstruído a partir da autenticação")
+    void deveRetornarUsuarioAtualReconstruidoDaAutenticacao() {
         // Given
         User user = new User(UUID.randomUUID(), Set.of(Restaurant.VIEW_RESTAURANT));
 
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
-        when(authentication.getPrincipal()).thenReturn(user);
+        when(authentication.getName()).thenReturn(user.getUuid().toString());
+        when(authentication.getAuthorities()).thenAnswer(invocation -> user.getRoles().stream().map(SimpleGrantedAuthority::new).toList());
 
         // When
         Optional<User> currentUser = adapter.getCurrentUser();
@@ -167,14 +169,13 @@ class LoggedUserGatewayAdapterTest {
     }
 
     @Test
-    @DisplayName("Deve retornar vazio se principal não for UserEntity")
-    void deveRetornarVazioSePrincipalNaoForUserEntity() {
+    @DisplayName("Deve retornar vazio se o nome na autenticação não for um UUID válido")
+    void deveRetornarVazioSeNomeNaAutenticacaoNaoForUUIDValido() {
         // Given
-        Object principal = new Object();
-
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
-        when(authentication.getPrincipal()).thenReturn(principal);
+        // Mock para simular um caso onde o nome do usuário no token não é um UUID
+        when(authentication.getName()).thenReturn("not-a-valid-uuid");
 
         // When
         Optional<User> currentUser = adapter.getCurrentUser();

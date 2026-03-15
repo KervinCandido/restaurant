@@ -58,7 +58,7 @@ public class RouteSecurityConfig {
                 .requestMatchers(HttpMethod.GET, restaurantUrl, restaurantWithIdUrl, menuItemBaseUrl, menuWithIdUrl).permitAll()
                 .anyRequest().authenticated() // Boa prática: fechar com uma regra padrão
             ).addFilterBefore(new TokenAuthenticationFilter(jwtService, userRepository), UsernamePasswordAuthenticationFilter.class)
-            .oauth2ResourceServer(oauth2 ->oauth2.jwt(Customizer.withDefaults()));
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         http.exceptionHandling(customizer ->
             customizer.accessDeniedHandler(accessDeniedHandler())
                     .authenticationEntryPoint(authenticationEntryPoint())

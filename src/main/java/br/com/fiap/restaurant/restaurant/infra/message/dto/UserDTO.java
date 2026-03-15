@@ -1,4 +1,4 @@
-package br.com.fiap.restaurant.restaurant.infra.consumer.dto;
+package br.com.fiap.restaurant.restaurant.infra.message.dto;
 
 import java.util.Set;
 import java.util.UUID;

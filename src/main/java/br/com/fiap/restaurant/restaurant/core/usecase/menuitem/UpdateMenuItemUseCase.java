@@ -8,6 +8,7 @@ import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.MenuItemGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.inbound.UpdateMenuItemInput;
 
@@ -18,11 +19,14 @@ public class UpdateMenuItemUseCase {
     private final LoggedUserGateway loggedUserGateway;
     private final MenuItemGateway menuItemGateway;
     private final RestaurantGateway restaurantGateway;
+    private final PublisherGateway<MenuItem> updateMenuItemPublisher;
 
-    public UpdateMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway, RestaurantGateway restaurantGateway) {
+    public UpdateMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway,
+                                 RestaurantGateway restaurantGateway, PublisherGateway<MenuItem> updateMenuItemPublisher) {
         this.loggedUserGateway = Objects.requireNonNull(loggedUserGateway, "LoggedUserGateway cannot be null");
         this.menuItemGateway = Objects.requireNonNull(menuItemGateway, "MenuItemGateway cannot be null");
         this.restaurantGateway = Objects.requireNonNull(restaurantGateway, "RestaurantGateway cannot be null");
+        this.updateMenuItemPublisher = Objects.requireNonNull(updateMenuItemPublisher, "updateMenuItemPublisher cannot be null.");
     }
 
     public MenuItem execute(UpdateMenuItemInput input) {
@@ -48,7 +52,7 @@ public class UpdateMenuItemUseCase {
         var ownerId = restaurant.getOwner() != null ? restaurant.getOwner().getUuid() : null;
         var currentUserId = currentUser.getUuid();
 
-        if (ownerId == null || currentUserId == null || !ownerId.equals(currentUserId)) {
+        if (ownerId == null || !ownerId.equals(currentUserId)) {
             throw new OperationNotAllowedException("Apenas o dono do restaurante pode atualizar itens do cardápio.");
         }
 
@@ -68,6 +72,9 @@ public class UpdateMenuItemUseCase {
                 input.photoPath() != null ? input.photoPath().trim() : existingItem.getPhotoPath()
         );
 
-        return menuItemGateway.save(updatedItem, restaurantId);
+        MenuItem saved = menuItemGateway.save(updatedItem, restaurantId);
+
+        updateMenuItemPublisher.publish(saved);
+        return saved;
     }
 }

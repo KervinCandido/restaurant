@@ -3,13 +3,18 @@ package br.com.fiap.restaurant.restaurant.core.usecase.menuitem;
 import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
+import br.com.fiap.restaurant.restaurant.core.domain.valueobject.Address;
+import br.com.fiap.restaurant.restaurant.core.domain.valueobject.OpeningHours;
 import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.MenuItemGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.inbound.CreateMenuItemInput;
 import br.com.fiap.restaurant.restaurant.utils.core.MenuItemBuilder;
+import br.com.fiap.restaurant.restaurant.utils.core.OpeningHoursBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +25,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,12 +45,40 @@ class CreateMenuItemUseCaseTest {
     @Mock private LoggedUserGateway loggedUserGateway;
     @Mock private MenuItemGateway menuItemGateway;
     @Mock private RestaurantGateway restaurantGateway;
+    @Mock private PublisherGateway<Restaurant> updateRestaurantPublisher;
 
     @InjectMocks
     private CreateMenuItemUseCase useCase;
 
     @Captor
     private ArgumentCaptor<MenuItem> menuItemCaptor;
+
+    private Restaurant restaurant;
+
+    @BeforeEach
+    void setUp() {
+        var ownerId = UUID.randomUUID();
+        var owner = new User(ownerId, Set.of(User.RESTAURANT_OWNER));
+
+        var address = new Address("Rua Teste", "123", "Bairro Teste", "Cidade Teste", "Estado Teste", "CEP Teste");
+        restaurant = new Restaurant(10L, "Current Restaurant", address, "Italiana", owner);
+
+        Set<OpeningHours> openingHours = new HashSet<>(3);
+        openingHours.add(OpeningHoursBuilder.builder().withoutId().withDayOfWeek(DayOfWeek.THURSDAY).build());
+        openingHours.add(OpeningHoursBuilder.builder().withoutId().withDayOfWeek(DayOfWeek.FRIDAY).build());
+        openingHours.add(OpeningHoursBuilder.builder().withoutId().withDayOfWeek(DayOfWeek.SATURDAY).build());
+        restaurant.addOpeningHours(openingHours);
+
+        Set<MenuItem> itemsMenu = new HashSet<>(3);
+        itemsMenu.add(MenuItemBuilder.builder().withoutId().build());
+        itemsMenu.add(MenuItemBuilder.builder().withoutId().build());
+        itemsMenu.add(MenuItemBuilder.builder().withoutId().build());
+        restaurant.addMenuItems(itemsMenu);
+
+        UUID oldEmployeeId = UUID.randomUUID();
+        var oldEmployee = new User(oldEmployeeId, Set.of(Restaurant.VIEW_RESTAURANT));
+        restaurant.addEmployee(oldEmployee);
+    }
 
     private MenuItemBuilder builder() {
         return MenuItemBuilder.builder()
@@ -63,18 +99,11 @@ class CreateMenuItemUseCaseTest {
      * IMPORTANTE: chame este helper somente nos testes que realmente precisam
      * passar pela validação de ownerId, senão o Mockito vai acusar stubs não usados.
      */
-    private Restaurant arrangeAuthorizedOwnerFlow(Long restaurantId, UUID ownerId) {
-        Restaurant restaurant = mock(Restaurant.class);
-        User owner = mock(User.class);
-        User currentUser = mock(User.class);
+    private Restaurant arrangeAuthorizedOwnerFlow(Long restaurantId) {
 
         given(loggedUserGateway.hasRole(MenuItem.CREATE_MENU_ITEM)).willReturn(true);
         given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(restaurant));
-        given(loggedUserGateway.requireCurrentUser()).willReturn(currentUser);
-
-        given(restaurant.getOwner()).willReturn(owner);
-        given(owner.getUuid()).willReturn(ownerId);
-        given(currentUser.getUuid()).willReturn(ownerId);
+        given(loggedUserGateway.requireCurrentUser()).willReturn(restaurant.getOwner());
 
         return restaurant;
     }
@@ -84,9 +113,8 @@ class CreateMenuItemUseCaseTest {
     void shouldCreateSuccessfullyWhenUserHasRoleAndIsOwner() {
         // Arrange
         Long restaurantId = 10L;
-        UUID ownerId = UUID.randomUUID();
 
-        arrangeAuthorizedOwnerFlow(restaurantId, ownerId);
+        arrangeAuthorizedOwnerFlow(restaurantId);
         given(menuItemGateway.existsByNameAndRestaurantId("Pizza", restaurantId)).willReturn(false);
 
         MenuItem saved = new MenuItem(
@@ -112,6 +140,7 @@ class CreateMenuItemUseCaseTest {
         then(restaurantGateway).should().findById(restaurantId);
         then(loggedUserGateway).should().requireCurrentUser();
         then(loggedUserGateway).should().hasRole(MenuItem.CREATE_MENU_ITEM);
+        then(updateRestaurantPublisher).should().publish(any(Restaurant.class));
     }
 
     @Test
@@ -131,6 +160,7 @@ class CreateMenuItemUseCaseTest {
         then(menuItemGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should().hasRole(MenuItem.CREATE_MENU_ITEM);
         then(loggedUserGateway).shouldHaveNoMoreInteractions();
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -154,6 +184,7 @@ class CreateMenuItemUseCaseTest {
         then(restaurantGateway).should().findById(restaurantId);
         then(loggedUserGateway).should(never()).requireCurrentUser();
         then(menuItemGateway).shouldHaveNoInteractions();
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -186,6 +217,7 @@ class CreateMenuItemUseCaseTest {
                 .hasMessageContaining("Apenas o dono do restaurante pode criar itens do cardápio.");
 
         then(menuItemGateway).shouldHaveNoInteractions();
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -214,6 +246,7 @@ class CreateMenuItemUseCaseTest {
 
         then(menuItemGateway).shouldHaveNoInteractions();
         then(menuItemGateway).should(never()).save(any(), any());
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
 
@@ -238,6 +271,7 @@ class CreateMenuItemUseCaseTest {
 
         then(menuItemGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should(never()).requireCurrentUser();
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -250,13 +284,14 @@ class CreateMenuItemUseCaseTest {
         then(loggedUserGateway).shouldHaveNoInteractions();
         then(restaurantGateway).shouldHaveNoInteractions();
         then(menuItemGateway).shouldHaveNoInteractions();
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
     @DisplayName("Deve lançar NullPointerException quando name é nulo")
     void shouldThrowNullPointerExceptionWhenNameIsNull() {
         // Arrange
-        Long restaurantId = 1L;
+        Long restaurantId = 10L;
 
         given(loggedUserGateway.hasRole(MenuItem.CREATE_MENU_ITEM)).willReturn(true);
         given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(mock(Restaurant.class)));
@@ -273,31 +308,32 @@ class CreateMenuItemUseCaseTest {
 
         then(menuItemGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should(never()).requireCurrentUser();
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
     @DisplayName("Deve lançar BusinessException quando nome duplicado no restaurante")
     void shouldThrowBusinessExceptionWhenDuplicatedNameInRestaurant() {
         // Arrange
-        Long restaurantId = 10L;
-        UUID ownerId = UUID.randomUUID();
-
-        Restaurant restaurant = arrangeAuthorizedOwnerFlow(restaurantId, ownerId);
-
-        given(restaurant.getName()).willReturn("Rest X");
-        given(menuItemGateway.existsByNameAndRestaurantId("Pizza", restaurantId)).willReturn(true);
+        Long restaurantId = restaurant.getId();
 
         CreateMenuItemInput input = builder()
                 .withName("  Pizza  ")
                 .buildCreateMenuInput(restaurantId);
 
+        given(loggedUserGateway.hasRole(MenuItem.CREATE_MENU_ITEM)).willReturn(true);
+        given(loggedUserGateway.requireCurrentUser()).willReturn(restaurant.getOwner());
+        given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(restaurant));
+        given(menuItemGateway.existsByNameAndRestaurantId("Pizza", restaurantId)).willReturn(true);
+
         // Act / Assert
         assertThatThrownBy(() -> useCase.execute(input))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Já existe um item de cardápio com o nome 'Pizza' no restaurante 'Rest X'.");
+                .hasMessageContaining("Já existe um item de cardápio com o nome");
 
         then(menuItemGateway).should().existsByNameAndRestaurantId("Pizza", restaurantId);
         then(menuItemGateway).should(never()).save(any(), any());
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -326,6 +362,7 @@ class CreateMenuItemUseCaseTest {
 
         then(menuItemGateway).shouldHaveNoInteractions();
         then(menuItemGateway).should(never()).save(any(), any());
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -333,20 +370,23 @@ class CreateMenuItemUseCaseTest {
     void shouldAllowNullDescription() {
         // Arrange
         Long restaurantId = 10L;
-        UUID ownerId = UUID.randomUUID();
 
-        arrangeAuthorizedOwnerFlow(restaurantId, ownerId);
+        MenuItemBuilder menuItemBuilder = builder().withDescription(null);
+        CreateMenuItemInput input = menuItemBuilder // <- cobre o ramo input.description() == null
+                .buildCreateMenuInput(restaurantId);
 
-        // precisa passar pela validação de duplicidade
+        MenuItem menuItem = menuItemBuilder.withId(2L).build();
+        restaurant.addMenuItem(menuItem);
+
+
+        given(loggedUserGateway.hasRole(MenuItem.CREATE_MENU_ITEM)).willReturn(true);
+        given(loggedUserGateway.requireCurrentUser()).willReturn(restaurant.getOwner());
         given(menuItemGateway.existsByNameAndRestaurantId("Pizza", restaurantId)).willReturn(false);
+        given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(restaurant));
 
         // retorno do save (pode ser qualquer objeto)
-        given(menuItemGateway.save(any(MenuItem.class), eq(restaurantId)))
-                .willAnswer(inv -> inv.getArgument(0));
-
-        CreateMenuItemInput input = builder()
-                .withDescription(null) // <- cobre o ramo input.description() == null
-                .buildCreateMenuInput(restaurantId);
+        given(menuItemGateway.save(any(MenuItem.class), eq(restaurantId))).willReturn(menuItem);
+        given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(restaurant));
 
         // Act
         useCase.execute(input);
@@ -361,6 +401,7 @@ class CreateMenuItemUseCaseTest {
         then(restaurantGateway).should().findById(restaurantId);
         then(loggedUserGateway).should().requireCurrentUser();
         then(loggedUserGateway).should().hasRole(MenuItem.CREATE_MENU_ITEM);
+        then(updateRestaurantPublisher).should().publish(restaurant);
     }
 
 

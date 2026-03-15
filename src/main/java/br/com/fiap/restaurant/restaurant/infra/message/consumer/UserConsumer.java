@@ -1,10 +1,10 @@
-package br.com.fiap.restaurant.restaurant.infra.consumer;
+package br.com.fiap.restaurant.restaurant.infra.message.consumer;
 
 import br.com.fiap.restaurant.restaurant.core.controller.UserController;
 import br.com.fiap.restaurant.restaurant.core.inbound.UserInput;
 import br.com.fiap.restaurant.restaurant.infra.config.RabbitMQConfig;
-import br.com.fiap.restaurant.restaurant.infra.consumer.dto.EventDTO;
-import br.com.fiap.restaurant.restaurant.infra.consumer.dto.UserDTO;
+import br.com.fiap.restaurant.restaurant.infra.message.dto.EventDTO;
+import br.com.fiap.restaurant.restaurant.infra.message.dto.UserDTO;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

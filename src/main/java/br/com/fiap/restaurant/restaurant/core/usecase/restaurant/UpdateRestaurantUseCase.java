@@ -10,6 +10,7 @@ import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedExcep
 import br.com.fiap.restaurant.restaurant.core.exception.RestaurantNameIsAlreadyInUseException;
 import br.com.fiap.restaurant.restaurant.core.exception.UserCannotBeRestaurantOwnerException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.UserGateway;
 import br.com.fiap.restaurant.restaurant.core.inbound.AddressInput;
@@ -25,11 +26,14 @@ public class UpdateRestaurantUseCase {
     private final LoggedUserGateway loggedUserGateway;
     private final RestaurantGateway restaurantGateway;
     private final UserGateway userGateway;
+    private final PublisherGateway<Restaurant> updateRestaurantPublisher;
 
-    public UpdateRestaurantUseCase(LoggedUserGateway loggedUserGateway, RestaurantGateway restaurantGateway, UserGateway userGateway) {
+    public UpdateRestaurantUseCase(LoggedUserGateway loggedUserGateway, RestaurantGateway restaurantGateway,
+                                   UserGateway userGateway, PublisherGateway<Restaurant> updateRestaurantPublisher) {
         this.loggedUserGateway = Objects.requireNonNull(loggedUserGateway, "LoggedUserGateway cannot be null");
         this.restaurantGateway = Objects.requireNonNull(restaurantGateway, "RestaurantGateway cannot be null");
         this.userGateway = Objects.requireNonNull(userGateway, "UserGateway cannot be null");
+        this.updateRestaurantPublisher = Objects.requireNonNull(updateRestaurantPublisher, "createRestaurantPublisher cannot be null.");
     }
 
     public void execute(UpdateRestaurantInput input) {
@@ -90,7 +94,8 @@ public class UpdateRestaurantUseCase {
         updated.addMenuItems(targetMenu);
         updated.addEmployees(targetEmployees);
 
-        restaurantGateway.save(updated);
+        var updatedRestaurant =  restaurantGateway.save(updated);
+        updateRestaurantPublisher.publish(updatedRestaurant);
     }
 
     private OpeningHours buildOpeningHours(UpdateOpeningHoursInput input) {

@@ -8,6 +8,7 @@ import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.MenuItemGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.inbound.UpdateMenuItemInput;
 import br.com.fiap.restaurant.restaurant.utils.core.MenuItemBuilder;
@@ -41,6 +42,7 @@ class UpdateMenuItemUseCaseTest {
     @Mock private MenuItemGateway menuItemGateway;
     @Mock private RestaurantGateway restaurantGateway;
     @Mock private LoggedUserGateway loggedUserGateway;
+    @Mock private PublisherGateway<MenuItem> updateMenuItemPublisher;
 
     @Captor
     private ArgumentCaptor<MenuItem> menuItemCaptor;
@@ -116,6 +118,7 @@ class UpdateMenuItemUseCaseTest {
 
         then(loggedUserGateway).should().hasRole(MenuItem.UPDATE_MENU_ITEM);
         then(loggedUserGateway).should().requireCurrentUser();
+        then(updateMenuItemPublisher).should().publish(result);
     }
 
     @Test
@@ -134,6 +137,7 @@ class UpdateMenuItemUseCaseTest {
         then(menuItemGateway).shouldHaveNoInteractions();
         then(restaurantGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should(never()).requireCurrentUser();
+        then(updateMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -154,6 +158,7 @@ class UpdateMenuItemUseCaseTest {
         then(restaurantGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should(never()).requireCurrentUser();
         then(menuItemGateway).should(never()).save(any(), any());
+        then(updateMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     // (cobre lambda$doExecute$1 ou $2): restaurantId não encontrado
@@ -194,6 +199,7 @@ class UpdateMenuItemUseCaseTest {
         then(restaurantGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should(never()).requireCurrentUser();
         then(menuItemGateway).should(never()).save(any(), any());
+        then(updateMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     // (cobre o outro lambda): restaurante não encontrado
@@ -236,6 +242,7 @@ class UpdateMenuItemUseCaseTest {
 
         then(loggedUserGateway).should(never()).requireCurrentUser();
         then(menuItemGateway).should(never()).save(any(), any());
+        then(updateMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -277,6 +284,7 @@ class UpdateMenuItemUseCaseTest {
         then(menuItemGateway).should().findRestaurantIdByItemId(itemId);
         then(restaurantGateway).should().findById(restaurantId);
         then(menuItemGateway).should(never()).save(any(), any());
+        then(updateMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -314,6 +322,7 @@ class UpdateMenuItemUseCaseTest {
 
         then(menuItemGateway).should().existsByNameAndRestaurantId("Pizza", restaurantId);
         then(menuItemGateway).should(never()).save(any(), any());
+        then(updateMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -327,6 +336,7 @@ class UpdateMenuItemUseCaseTest {
         then(loggedUserGateway).shouldHaveNoInteractions();
         then(menuItemGateway).shouldHaveNoInteractions();
         then(restaurantGateway).shouldHaveNoInteractions();
+        then(updateMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -361,11 +371,12 @@ class UpdateMenuItemUseCaseTest {
                 .willAnswer(inv -> inv.getArgument(0, MenuItem.class));
 
         // Act
-        useCase.execute(input);
+        MenuItem menuItem = useCase.execute(input);
 
         // Assert
         then(menuItemGateway).should(never()).existsByNameAndRestaurantId(any(), any());
         then(menuItemGateway).should().save(any(MenuItem.class), eq(restaurantId));
+        then(updateMenuItemPublisher).should().publish(menuItem);
     }
 
     @Test
@@ -402,7 +413,7 @@ class UpdateMenuItemUseCaseTest {
                 .willAnswer(inv -> inv.getArgument(0, MenuItem.class));
 
         // Act
-        useCase.execute(input);
+        MenuItem menuItem = useCase.execute(input);
 
         // Assert
         then(menuItemGateway).should().save(menuItemCaptor.capture(), eq(restaurantId));
@@ -410,6 +421,7 @@ class UpdateMenuItemUseCaseTest {
 
         assertThat(captured.getDescription()).isNull();
         assertThat(captured.getPhotoPath()).isEqualTo("/photos/pizza.jpg");
+        then(updateMenuItemPublisher).should().publish(menuItem);
     }
 
     @Test
@@ -446,7 +458,7 @@ class UpdateMenuItemUseCaseTest {
                 .willAnswer(inv -> inv.getArgument(0, MenuItem.class));
 
         // Act
-        useCase.execute(input);
+        MenuItem menuItem = useCase.execute(input);
 
         // Assert
         then(menuItemGateway).should().save(menuItemCaptor.capture(), eq(restaurantId));
@@ -454,6 +466,7 @@ class UpdateMenuItemUseCaseTest {
 
         assertThat(captured.getPhotoPath()).isEqualTo("/old.jpg");
         assertThat(captured.getDescription()).isEqualTo("Nova");
+        then(updateMenuItemPublisher).should().publish(menuItem);
     }
 
 

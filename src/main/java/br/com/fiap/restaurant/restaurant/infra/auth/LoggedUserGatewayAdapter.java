@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class LoggedUserGatewayAdapter implements LoggedUserGateway {
@@ -29,9 +31,11 @@ public class LoggedUserGatewayAdapter implements LoggedUserGateway {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) return Optional.empty();
 
-        if (auth.getPrincipal() instanceof User u) {
-            return Optional.of(u);
+        try {
+            var roles = auth.getAuthorities().parallelStream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+            return Optional.of(new User(UUID.fromString(auth.getName()), roles));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }

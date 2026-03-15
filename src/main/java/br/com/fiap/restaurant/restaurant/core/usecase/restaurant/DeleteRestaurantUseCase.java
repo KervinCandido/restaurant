@@ -5,6 +5,7 @@ import br.com.fiap.restaurant.restaurant.core.domain.User;
 import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 
 import java.util.Objects;
@@ -13,10 +14,12 @@ public class DeleteRestaurantUseCase {
 
     private final LoggedUserGateway loggedUserGateway;
     private final RestaurantGateway restaurantGateway;
+    private final PublisherGateway<Restaurant> deleteRestaurantPublisher;
 
-    public DeleteRestaurantUseCase(LoggedUserGateway loggedUserGateway, RestaurantGateway restaurantGateway) {
+    public DeleteRestaurantUseCase(LoggedUserGateway loggedUserGateway, RestaurantGateway restaurantGateway, PublisherGateway<Restaurant> deleteRestaurantPublisher) {
         this.loggedUserGateway = Objects.requireNonNull(loggedUserGateway, "LoggedUserGateway cannot be null.");
         this.restaurantGateway = Objects.requireNonNull(restaurantGateway, "RestaurantGateway cannot be null.");
+        this.deleteRestaurantPublisher = Objects.requireNonNull(deleteRestaurantPublisher, "deleteRestaurantPublisher cannot be null.");
     }
 
     public void execute(Long restaurantId) {
@@ -35,5 +38,6 @@ public class DeleteRestaurantUseCase {
         }
 
         restaurantGateway.delete(restaurantId);
+        deleteRestaurantPublisher.publish(restaurant);
     }
 }

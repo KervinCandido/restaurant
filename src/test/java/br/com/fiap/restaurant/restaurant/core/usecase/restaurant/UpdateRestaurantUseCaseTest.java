@@ -10,6 +10,7 @@ import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedExcep
 import br.com.fiap.restaurant.restaurant.core.exception.RestaurantNameIsAlreadyInUseException;
 import br.com.fiap.restaurant.restaurant.core.exception.UserCannotBeRestaurantOwnerException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.UserGateway;
 import br.com.fiap.restaurant.restaurant.core.inbound.AddressInput;
@@ -47,9 +48,17 @@ import static org.mockito.Mockito.times;
 @DisplayName("Testes para UpdateRestaurantUseCase")
 class UpdateRestaurantUseCaseTest {
 
-    @Mock private LoggedUserGateway loggedUserGateway;
-    @Mock private RestaurantGateway restaurantGateway;
-    @Mock private UserGateway userGateway;
+    @Mock
+    private LoggedUserGateway loggedUserGateway;
+
+    @Mock
+    private RestaurantGateway restaurantGateway;
+
+    @Mock
+    private UserGateway userGateway;
+
+    @Mock
+    private PublisherGateway<Restaurant> updateRestaurantPublisher;
 
     @InjectMocks
     private UpdateRestaurantUseCase updateRestaurantUseCase;
@@ -127,6 +136,7 @@ class UpdateRestaurantUseCaseTest {
         given(userGateway.findById(newOwnerId)).willReturn(Optional.of(newOwner));
         given(restaurantGateway.existsRestaurantWithName("New Name")).willReturn(false);
         given(userGateway.findById(newEmployeeId)).willReturn(Optional.of(newEmployee));
+        given(restaurantGateway.save(any(Restaurant.class))).willReturn(current);
 
         // Act
         updateRestaurantUseCase.execute(input);
@@ -150,6 +160,7 @@ class UpdateRestaurantUseCaseTest {
         then(userGateway).should().findById(newOwnerId);
         then(restaurantGateway).should().existsRestaurantWithName("New Name");
         then(userGateway).should().findById(newEmployeeId);
+        then(updateRestaurantPublisher).should().publish(saved);
     }
 
     @Test
@@ -171,6 +182,7 @@ class UpdateRestaurantUseCaseTest {
         given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(current));
         given(loggedUserGateway.requireCurrentUser()).willReturn(owner);
         given(userGateway.findById(ownerId)).willReturn(Optional.of(owner));
+        given(restaurantGateway.save(any(Restaurant.class))).willReturn(current);
 
         // Act
         updateRestaurantUseCase.execute(input);
@@ -188,6 +200,7 @@ class UpdateRestaurantUseCaseTest {
         // employees null -> NÃO consulta employee no gateway
         then(userGateway).should(times(1)).findById(ownerId);
         then(userGateway).shouldHaveNoMoreInteractions();
+        then(updateRestaurantPublisher).should().publish(saved);
     }
 
     @Test
@@ -219,6 +232,7 @@ class UpdateRestaurantUseCaseTest {
                 .hasMessageContaining("Employee " + missingEmployeeId + " not found.");
 
         then(restaurantGateway).should(never()).save(any(Restaurant.class));
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -236,6 +250,7 @@ class UpdateRestaurantUseCaseTest {
         then(restaurantGateway).shouldHaveNoInteractions();
         then(userGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should(never()).requireCurrentUser();
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -267,6 +282,7 @@ class UpdateRestaurantUseCaseTest {
         then(userGateway).shouldHaveNoInteractions();
         then(restaurantGateway).should(never()).existsRestaurantWithName(anyString());
         then(restaurantGateway).should(never()).save(any(Restaurant.class));
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -295,6 +311,7 @@ class UpdateRestaurantUseCaseTest {
                 .isInstanceOf(RestaurantNameIsAlreadyInUseException.class);
 
         then(restaurantGateway).should(never()).save(any(Restaurant.class));
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -326,6 +343,7 @@ class UpdateRestaurantUseCaseTest {
 
         then(restaurantGateway).should(never()).existsRestaurantWithName(anyString());
         then(restaurantGateway).should(never()).save(any(Restaurant.class));
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -357,6 +375,7 @@ class UpdateRestaurantUseCaseTest {
 
         then(restaurantGateway).should(never()).existsRestaurantWithName(anyString());
         then(restaurantGateway).should(never()).save(any(Restaurant.class));
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -370,6 +389,7 @@ class UpdateRestaurantUseCaseTest {
         then(loggedUserGateway).shouldHaveNoInteractions();
         then(restaurantGateway).shouldHaveNoInteractions();
         then(userGateway).shouldHaveNoInteractions();
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -398,6 +418,7 @@ class UpdateRestaurantUseCaseTest {
         then(loggedUserGateway).should(never()).requireCurrentUser();
         then(userGateway).shouldHaveNoInteractions();
         then(restaurantGateway).should(never()).save(any(Restaurant.class));
+        then(updateRestaurantPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -421,6 +442,7 @@ class UpdateRestaurantUseCaseTest {
         given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(current));
         given(loggedUserGateway.requireCurrentUser()).willReturn(owner);
         given(userGateway.findById(sameOwnerId)).willReturn(Optional.of(owner)); // só 1 vez
+        given(restaurantGateway.save(any(Restaurant.class))).willReturn(current);
 
         // Act
         updateRestaurantUseCase.execute(input);
@@ -434,5 +456,6 @@ class UpdateRestaurantUseCaseTest {
 
         then(userGateway).should(times(1)).findById(sameOwnerId);
         then(restaurantGateway).should(never()).existsRestaurantWithName(anyString());
+        then(updateRestaurantPublisher).should().publish(saved);
     }
 }
