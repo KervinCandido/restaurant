@@ -9,11 +9,9 @@ import br.com.fiap.restaurant.restaurant.core.usecase.restaurant.*;
 import br.com.fiap.restaurant.restaurant.core.usecase.user.CreateUserUseCase;
 import br.com.fiap.restaurant.restaurant.core.usecase.user.DeleteUserUseCase;
 import br.com.fiap.restaurant.restaurant.core.usecase.user.UpdateUserUseCase;
-import br.com.fiap.restaurant.restaurant.infra.publisher.RestaurantCreatedPublisher;
+import br.com.fiap.restaurant.restaurant.infra.message.publisher.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 @Configuration
 public class CoreUseCaseConfig {
@@ -29,12 +27,15 @@ public class CoreUseCaseConfig {
             UserGateway userGateway,
             RestaurantCreatedPublisher restaurantCreatedPublisher
     ) {
-        return new CreateRestaurantUseCase(loggedUserGateway, restaurantGateway, userGateway, List.of(restaurantCreatedPublisher));
+        return new CreateRestaurantUseCase(loggedUserGateway, restaurantGateway, userGateway, restaurantCreatedPublisher);
     }
 
     @Bean
-    UpdateRestaurantUseCase updateRestaurantUseCase(LoggedUserGateway loggedUserGateway, RestaurantGateway restaurantGateway, UserGateway userGateway) {
-        return new UpdateRestaurantUseCase(loggedUserGateway, restaurantGateway, userGateway);
+    UpdateRestaurantUseCase updateRestaurantUseCase(LoggedUserGateway loggedUserGateway,
+                                                    RestaurantGateway restaurantGateway,
+                                                    UserGateway userGateway,
+                                                    RestaurantUpdatedPublisher updateRestaurantPublisher) {
+        return new UpdateRestaurantUseCase(loggedUserGateway, restaurantGateway, userGateway, updateRestaurantPublisher);
     }
 
     @Bean
@@ -48,8 +49,10 @@ public class CoreUseCaseConfig {
     }
 
     @Bean
-    DeleteRestaurantUseCase deleteRestaurantUseCase(LoggedUserGateway loggedUserGateway, RestaurantGateway restaurantGateway) {
-        return new DeleteRestaurantUseCase(loggedUserGateway, restaurantGateway);
+    DeleteRestaurantUseCase deleteRestaurantUseCase(LoggedUserGateway loggedUserGateway,
+                                                    RestaurantGateway restaurantGateway,
+                                                    RestaurantDeletedPublisher restaurantDeletedPublisher) {
+        return new DeleteRestaurantUseCase(loggedUserGateway, restaurantGateway, restaurantDeletedPublisher);
     }
 
     @Bean
@@ -89,13 +92,15 @@ public class CoreUseCaseConfig {
     }
 
     @Bean
-    CreateMenuItemUseCase createMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway, RestaurantGateway restaurantGateway) {
-        return new CreateMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway);
+    CreateMenuItemUseCase createMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway,
+                                                RestaurantGateway restaurantGateway, RestaurantUpdatedPublisher restaurantUpdatedPublisher) {
+        return new CreateMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway, restaurantUpdatedPublisher);
     }
 
     @Bean
-    DeleteMenuItemUseCase deleteMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway, RestaurantGateway restaurantGateway) {
-        return new DeleteMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway);
+    DeleteMenuItemUseCase deleteMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway,
+                                                RestaurantGateway restaurantGateway, MenuItemDeletedPublisher menuItemDeletedPublisher) {
+        return new DeleteMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway, menuItemDeletedPublisher);
     }
 
     @Bean
@@ -114,8 +119,9 @@ public class CoreUseCaseConfig {
     }
 
     @Bean
-    UpdateMenuItemUseCase updateMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway, RestaurantGateway restaurantGateway) {
-        return new UpdateMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway);
+    UpdateMenuItemUseCase updateMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway,
+                                                RestaurantGateway restaurantGateway, MenuItemUpdatedPublisher menuItemUpdatedPublisher) {
+        return new UpdateMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway, menuItemUpdatedPublisher);
     }
 
     @Bean

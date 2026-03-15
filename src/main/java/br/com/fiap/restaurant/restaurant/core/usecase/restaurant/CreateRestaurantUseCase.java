@@ -23,13 +23,14 @@ public class CreateRestaurantUseCase {
     private final LoggedUserGateway loggedUserGateway;
     private final RestaurantGateway restaurantGateway;
     private final UserGateway userGateway;
-    private final List<PublisherGateway<Restaurant>> publisherGateways;
+    private final PublisherGateway<Restaurant> createRestaurantPublisher;
 
-    public CreateRestaurantUseCase(LoggedUserGateway loggedUserGateway, RestaurantGateway restaurantGateway, UserGateway userGateway, List<PublisherGateway<Restaurant>> publisherGateways) {
+    public CreateRestaurantUseCase(LoggedUserGateway loggedUserGateway, RestaurantGateway restaurantGateway,
+                                   UserGateway userGateway, PublisherGateway<Restaurant> createRestaurantPublisher) {
         this.loggedUserGateway = Objects.requireNonNull(loggedUserGateway, "loggedUserGateway cannot be null.");
         this.restaurantGateway = Objects.requireNonNull(restaurantGateway, "restaurantGateway cannot be null.");
         this.userGateway = Objects.requireNonNull(userGateway, "userGateway cannot be null.");
-        this.publisherGateways = Objects.requireNonNull(publisherGateways, "notifierGateways cannot be null.");
+        this.createRestaurantPublisher = Objects.requireNonNull(createRestaurantPublisher, "createRestaurantPublisher cannot be null.");
     }
 
     public Restaurant execute(CreateRestaurantInput input) {
@@ -84,7 +85,7 @@ public class CreateRestaurantUseCase {
 
         var newRestaurant = restaurantGateway.save(restaurant);
 
-        publisherGateways.forEach(n -> n.publish(newRestaurant));
+        createRestaurantPublisher.publish(newRestaurant);
 
         return newRestaurant;
     }

@@ -97,7 +97,7 @@ class CreateRestaurantUseCaseTest {
         this.employees = new HashSet<>(1);
         this.employees.add(UUID.randomUUID());
 
-        this.createRestaurantUseCase = new CreateRestaurantUseCase(loggedUserGateway, restaurantGateway, userGateway, List.of(createRestaurantPublisherGateway));
+        this.createRestaurantUseCase = new CreateRestaurantUseCase(loggedUserGateway, restaurantGateway, userGateway, createRestaurantPublisherGateway);
     }
 
     @DisplayName("Deve criar restaurante com sucesso")

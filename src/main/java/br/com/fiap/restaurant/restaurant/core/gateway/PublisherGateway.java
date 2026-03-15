@@ -1,7 +1,7 @@
 package br.com.fiap.restaurant.restaurant.core.gateway;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
-public interface PublisherGateway<T> {
-    Future<Void> publish(T t);
+public interface PublisherGateway<E> {
+    CompletableFuture<Void> publish(E event);
 }

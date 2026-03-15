@@ -7,6 +7,7 @@ import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.MenuItemGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
 import br.com.fiap.restaurant.restaurant.core.inbound.CreateMenuItemInput;
 
@@ -18,15 +19,18 @@ public class CreateMenuItemUseCase {
     private final LoggedUserGateway loggedUserGateway;
     private final MenuItemGateway menuItemGateway;
     private final RestaurantGateway restaurantGateway;
+    private final PublisherGateway<Restaurant> updateRestaurantPublisher;
 
     public CreateMenuItemUseCase(
             LoggedUserGateway loggedUserGateway,
             MenuItemGateway menuItemGateway,
-            RestaurantGateway restaurantGateway
+            RestaurantGateway restaurantGateway,
+            PublisherGateway<Restaurant> updateRestaurantPublisher
     ) {
         this.loggedUserGateway = Objects.requireNonNull(loggedUserGateway, "LoggedUserGateway cannot be null.");
         this.menuItemGateway = Objects.requireNonNull(menuItemGateway, "MenuItemGateway cannot be null.");
         this.restaurantGateway = Objects.requireNonNull(restaurantGateway, "RestaurantGateway cannot be null.");
+        this.updateRestaurantPublisher = Objects.requireNonNull(updateRestaurantPublisher, "createRestaurantPublisher cannot be null.");
     }
 
     public MenuItem execute(CreateMenuItemInput input) {
@@ -56,7 +60,7 @@ public class CreateMenuItemUseCase {
         UUID ownerId = restaurant.getOwner() != null ? restaurant.getOwner().getUuid() : null;
         UUID currentUserId = currentUser != null ? currentUser.getUuid() : null;
 
-        if (ownerId == null || currentUserId == null || !ownerId.equals(currentUserId)) {
+        if (ownerId == null || !ownerId.equals(currentUserId)) {
             throw new OperationNotAllowedException("Apenas o dono do restaurante pode criar itens do cardápio.");
         }
 
@@ -76,6 +80,10 @@ public class CreateMenuItemUseCase {
                 photoPath
         );
 
-        return menuItemGateway.save(menuItem, restaurantId);
+        MenuItem saved = menuItemGateway.save(menuItem, restaurantId);
+        restaurant.addMenuItem(saved);
+
+        updateRestaurantPublisher.publish(restaurant);
+        return saved;
     }
 }

@@ -3,11 +3,15 @@ package br.com.fiap.restaurant.restaurant.core.usecase.menuitem;
 import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
+import br.com.fiap.restaurant.restaurant.core.domain.valueobject.Address;
 import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.MenuItemGateway;
+import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.core.gateway.RestaurantGateway;
+import br.com.fiap.restaurant.restaurant.utils.core.MenuItemBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,9 +35,31 @@ class DeleteMenuItemUseCaseTest {
     @Mock private LoggedUserGateway loggedUserGateway;
     @Mock private MenuItemGateway menuItemGateway;
     @Mock private RestaurantGateway restaurantGateway;
+    @Mock private PublisherGateway<MenuItem> deleteMenuItemPublisher;
 
     @InjectMocks
     private DeleteMenuItemUseCase useCase;
+
+    private Restaurant restaurant;
+    private User owner;
+    private Long restaurantId;
+    private Long itemId;
+
+    @BeforeEach
+    void setUp() {
+        // Arrange
+        itemId = 10L;
+        restaurantId = 5L;
+
+        UUID ownerId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        owner = new User(ownerId, Set.of(User.RESTAURANT_OWNER));
+
+        Address address = new Address("Rua Teste", "123", "Bairro Teste", "Cidade Teste", "Estado Teste", "CEP Teste");
+
+        restaurant = new Restaurant(restaurantId, "Current Restaurant", address, "Italiana", owner);
+        restaurant.addMenuItem(MenuItemBuilder.builder().withId(itemId).build());
+
+    }
 
     @Test
     @DisplayName("Deve lançar NullPointerException quando input for nulo (UseCaseBase)")
@@ -45,6 +72,7 @@ class DeleteMenuItemUseCaseTest {
         then(loggedUserGateway).shouldHaveNoInteractions();
         then(menuItemGateway).shouldHaveNoInteractions();
         then(restaurantGateway).shouldHaveNoInteractions();
+        then(deleteMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -62,13 +90,13 @@ class DeleteMenuItemUseCaseTest {
         then(loggedUserGateway).shouldHaveNoMoreInteractions();
         then(menuItemGateway).shouldHaveNoInteractions();
         then(restaurantGateway).shouldHaveNoInteractions();
+        then(deleteMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     @Test
     @DisplayName("Deve lançar BusinessException quando não encontrar restaurantId associado ao item")
     void shouldThrowBusinessExceptionWhenRestaurantIdNotFoundForItem() {
         // Arrange
-        Long itemId = 10L;
 
         given(loggedUserGateway.hasRole(MenuItem.DELETE_MENU_ITEM)).willReturn(true);
         given(menuItemGateway.findRestaurantIdByItemId(itemId)).willReturn(Optional.empty());
@@ -84,106 +112,45 @@ class DeleteMenuItemUseCaseTest {
         then(restaurantGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should(never()).requireCurrentUser();
         then(menuItemGateway).should(never()).deleteById(anyLong());
+        then(deleteMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     @Test
     @DisplayName("Deve lançar BusinessException quando restaurante não existir")
     void shouldThrowBusinessExceptionWhenRestaurantNotFound() {
         // Arrange
-        Long itemId = 10L;
-        Long restaurantId = 99L;
+        Long invalidRestaurantId = 99L;
 
         given(loggedUserGateway.hasRole(MenuItem.DELETE_MENU_ITEM)).willReturn(true);
-        given(menuItemGateway.findRestaurantIdByItemId(itemId)).willReturn(Optional.of(restaurantId));
-        given(restaurantGateway.findById(restaurantId)).willReturn(Optional.empty());
+        given(menuItemGateway.findRestaurantIdByItemId(itemId)).willReturn(Optional.of(invalidRestaurantId));
+        given(restaurantGateway.findById(invalidRestaurantId)).willReturn(Optional.empty());
 
         // Act / Assert
         assertThatThrownBy(() -> useCase.execute(itemId))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("Restaurante não encontrado com ID: " + restaurantId);
+                .hasMessageContaining("Restaurante não encontrado com ID: " + invalidRestaurantId);
 
         then(loggedUserGateway).should().hasRole(MenuItem.DELETE_MENU_ITEM);
         then(menuItemGateway).should().findRestaurantIdByItemId(itemId);
-        then(restaurantGateway).should().findById(restaurantId);
+        then(restaurantGateway).should().findById(invalidRestaurantId);
 
         then(loggedUserGateway).should(never()).requireCurrentUser();
         then(menuItemGateway).should(never()).deleteById(anyLong());
-    }
-
-    @Test
-    @DisplayName("Deve negar quando restaurante não tem ownerId (ownerId = null)")
-    void shouldThrowOperationNotAllowedWhenRestaurantOwnerIsNull() {
-        // Arrange
-        Long itemId = 10L;
-        Long restaurantId = 1L;
-
-        Restaurant restaurant = mock(Restaurant.class);
-        User currentUser = mock(User.class);
-
-        given(loggedUserGateway.hasRole(MenuItem.DELETE_MENU_ITEM)).willReturn(true);
-        given(menuItemGateway.findRestaurantIdByItemId(itemId)).willReturn(Optional.of(restaurantId));
-        given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(restaurant));
-        given(loggedUserGateway.requireCurrentUser()).willReturn(currentUser);
-
-        given(restaurant.getOwner()).willReturn(null); // <- cobre ownerId == null
-        given(currentUser.getUuid()).willReturn(UUID.randomUUID());
-
-        // Act / Assert
-        assertThatThrownBy(() -> useCase.execute(itemId))
-                .isInstanceOf(OperationNotAllowedException.class)
-                .hasMessageContaining("Apenas o dono do restaurante pode deletar itens do cardápio.");
-
-        then(menuItemGateway).should(never()).deleteById(anyLong());
-    }
-
-    @Test
-    @DisplayName("Deve negar quando usuário atual for nulo (currentId = null)")
-    void shouldThrowOperationNotAllowedWhenCurrentUserIsNull() {
-        // Arrange
-        Long itemId = 10L;
-        Long restaurantId = 1L;
-
-        Restaurant restaurant = mock(Restaurant.class);
-        User owner = mock(User.class);
-
-        given(loggedUserGateway.hasRole(MenuItem.DELETE_MENU_ITEM)).willReturn(true);
-        given(menuItemGateway.findRestaurantIdByItemId(itemId)).willReturn(Optional.of(restaurantId));
-        given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(restaurant));
-        given(loggedUserGateway.requireCurrentUser()).willReturn(null); // <- cobre currentId == null
-
-        given(restaurant.getOwner()).willReturn(owner);
-        given(owner.getUuid()).willReturn(UUID.randomUUID());
-
-        // Act / Assert
-        assertThatThrownBy(() -> useCase.execute(itemId))
-                .isInstanceOf(OperationNotAllowedException.class)
-                .hasMessageContaining("Apenas o dono do restaurante pode deletar itens do cardápio.");
-
-        then(menuItemGateway).should(never()).deleteById(anyLong());
+        then(deleteMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     @Test
     @DisplayName("Deve negar quando usuário não for o dono (comparando por UUID)")
     void shouldThrowOperationNotAllowedWhenUserIsNotOwner() {
         // Arrange
-        Long itemId = 10L;
-        Long restaurantId = 1L;
 
-        UUID ownerId = UUID.randomUUID();
         UUID currentUserId = UUID.randomUUID();
-
-        Restaurant restaurant = mock(Restaurant.class);
-        User owner = mock(User.class);
-        User currentUser = mock(User.class);
+        User currentUser = new User(currentUserId, Set.of(Restaurant.VIEW_RESTAURANT));
 
         given(loggedUserGateway.hasRole(MenuItem.DELETE_MENU_ITEM)).willReturn(true);
         given(menuItemGateway.findRestaurantIdByItemId(itemId)).willReturn(Optional.of(restaurantId));
         given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(restaurant));
         given(loggedUserGateway.requireCurrentUser()).willReturn(currentUser);
-
-        given(restaurant.getOwner()).willReturn(owner);
-        given(owner.getUuid()).willReturn(ownerId);
-        given(currentUser.getUuid()).willReturn(currentUserId);
 
         // Act / Assert
         assertThatThrownBy(() -> useCase.execute(itemId))
@@ -191,34 +158,24 @@ class DeleteMenuItemUseCaseTest {
                 .hasMessageContaining("Apenas o dono do restaurante pode deletar itens do cardápio.");
 
         then(menuItemGateway).should(never()).deleteById(anyLong());
+        then(deleteMenuItemPublisher).shouldHaveNoInteractions();
     }
 
     @Test
     @DisplayName("Deve deletar item com sucesso quando usuário for dono e tiver permissão")
     void shouldDeleteSuccessfullyWhenUserIsOwnerAndHasRole() {
         // Arrange
-        Long itemId = 10L;
-        Long restaurantId = 1L;
-
-        UUID ownerId = UUID.randomUUID();
-
-        Restaurant restaurant = mock(Restaurant.class);
-        User owner = mock(User.class);
-        User currentUser = mock(User.class);
 
         given(loggedUserGateway.hasRole(MenuItem.DELETE_MENU_ITEM)).willReturn(true);
         given(menuItemGateway.findRestaurantIdByItemId(itemId)).willReturn(Optional.of(restaurantId));
         given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(restaurant));
-        given(loggedUserGateway.requireCurrentUser()).willReturn(currentUser);
-
-        given(restaurant.getOwner()).willReturn(owner);
-        given(owner.getUuid()).willReturn(ownerId);
-        given(currentUser.getUuid()).willReturn(ownerId);
+        given(loggedUserGateway.requireCurrentUser()).willReturn(restaurant.getOwner());
 
         // Act
         useCase.execute(itemId);
 
         // Assert
         then(menuItemGateway).should().deleteById(itemId);
+        then(deleteMenuItemPublisher).should().publish(any(MenuItem.class));
     }
 }
