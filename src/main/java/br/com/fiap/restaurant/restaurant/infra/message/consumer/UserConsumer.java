@@ -29,7 +29,7 @@ public class UserConsumer {
     @RabbitListener(queues = RabbitMQConfig.RESTAURANT_USER_CREATE_QUEUE)
     public void createUserConsumer(EventDTO<UserDTO> eventDTO, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws java.io.IOException {
         try {
-            log.info("Consumindo CreateUserEvent: {}", eventDTO);
+            log.info("Consuming create user event: {}", eventDTO);
             var userDTO = eventDTO.body();
             UserInput userInput = new UserInput(userDTO.uuid(), userDTO.roles());
             userController.createUser(userInput);
@@ -42,7 +42,7 @@ public class UserConsumer {
     @RabbitListener(queues = RabbitMQConfig.RESTAURANT_USER_UPDATE_QUEUE)
     public void updateUserConsumer(EventDTO<UserDTO> eventDTO, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws java.io.IOException {
         try {
-            log.info("Consumindo UpdateUserEvent: {}", eventDTO);
+            log.info("Consuming update user event: {}", eventDTO);
             var userDTO = eventDTO.body();
             UserInput userInput = new UserInput(userDTO.uuid(), userDTO.roles());
             userController.updateUser(userInput);
@@ -55,7 +55,7 @@ public class UserConsumer {
     @RabbitListener(queues = RabbitMQConfig.RESTAURANT_USER_DELETE_QUEUE)
     public void deleteUserConsume(EventDTO<UserDTO> eventDTO, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws java.io.IOException {
         try {
-            log.info("Consumindo DeleteUserEvent: {}", eventDTO);
+            log.info("Consuming delete user event: {}", eventDTO);
             var userDTO = eventDTO.body();
             userController.deleteUser(userDTO.uuid());
             channel.basicAck(tag, false);
