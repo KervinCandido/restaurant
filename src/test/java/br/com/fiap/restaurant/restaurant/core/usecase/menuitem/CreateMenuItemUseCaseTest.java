@@ -5,6 +5,7 @@ import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
 import br.com.fiap.restaurant.restaurant.core.domain.valueobject.Address;
 import br.com.fiap.restaurant.restaurant.core.domain.valueobject.OpeningHours;
+import br.com.fiap.restaurant.restaurant.core.event.MenuItemEvent;
 import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
@@ -45,7 +46,7 @@ class CreateMenuItemUseCaseTest {
     @Mock private LoggedUserGateway loggedUserGateway;
     @Mock private MenuItemGateway menuItemGateway;
     @Mock private RestaurantGateway restaurantGateway;
-    @Mock private PublisherGateway<Restaurant> updateRestaurantPublisher;
+    @Mock private PublisherGateway<MenuItemEvent> menuItemCreatePublisher;
 
     @InjectMocks
     private CreateMenuItemUseCase useCase;
@@ -140,7 +141,7 @@ class CreateMenuItemUseCaseTest {
         then(restaurantGateway).should().findById(restaurantId);
         then(loggedUserGateway).should().requireCurrentUser();
         then(loggedUserGateway).should().hasRole(MenuItem.CREATE_MENU_ITEM);
-        then(updateRestaurantPublisher).should().publish(any(Restaurant.class));
+        then(menuItemCreatePublisher).should().publish(any(MenuItemEvent.class));
     }
 
     @Test
@@ -160,7 +161,7 @@ class CreateMenuItemUseCaseTest {
         then(menuItemGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should().hasRole(MenuItem.CREATE_MENU_ITEM);
         then(loggedUserGateway).shouldHaveNoMoreInteractions();
-        then(updateRestaurantPublisher).shouldHaveNoInteractions();
+        then(menuItemCreatePublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -184,7 +185,7 @@ class CreateMenuItemUseCaseTest {
         then(restaurantGateway).should().findById(restaurantId);
         then(loggedUserGateway).should(never()).requireCurrentUser();
         then(menuItemGateway).shouldHaveNoInteractions();
-        then(updateRestaurantPublisher).shouldHaveNoInteractions();
+        then(menuItemCreatePublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -217,7 +218,7 @@ class CreateMenuItemUseCaseTest {
                 .hasMessageContaining("Apenas o dono do restaurante pode criar itens do cardápio.");
 
         then(menuItemGateway).shouldHaveNoInteractions();
-        then(updateRestaurantPublisher).shouldHaveNoInteractions();
+        then(menuItemCreatePublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -246,7 +247,7 @@ class CreateMenuItemUseCaseTest {
 
         then(menuItemGateway).shouldHaveNoInteractions();
         then(menuItemGateway).should(never()).save(any(), any());
-        then(updateRestaurantPublisher).shouldHaveNoInteractions();
+        then(menuItemCreatePublisher).shouldHaveNoInteractions();
     }
 
 
@@ -271,7 +272,7 @@ class CreateMenuItemUseCaseTest {
 
         then(menuItemGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should(never()).requireCurrentUser();
-        then(updateRestaurantPublisher).shouldHaveNoInteractions();
+        then(menuItemCreatePublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -284,7 +285,7 @@ class CreateMenuItemUseCaseTest {
         then(loggedUserGateway).shouldHaveNoInteractions();
         then(restaurantGateway).shouldHaveNoInteractions();
         then(menuItemGateway).shouldHaveNoInteractions();
-        then(updateRestaurantPublisher).shouldHaveNoInteractions();
+        then(menuItemCreatePublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -308,7 +309,7 @@ class CreateMenuItemUseCaseTest {
 
         then(menuItemGateway).shouldHaveNoInteractions();
         then(loggedUserGateway).should(never()).requireCurrentUser();
-        then(updateRestaurantPublisher).shouldHaveNoInteractions();
+        then(menuItemCreatePublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -333,7 +334,7 @@ class CreateMenuItemUseCaseTest {
 
         then(menuItemGateway).should().existsByNameAndRestaurantId("Pizza", restaurantId);
         then(menuItemGateway).should(never()).save(any(), any());
-        then(updateRestaurantPublisher).shouldHaveNoInteractions();
+        then(menuItemCreatePublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -362,7 +363,7 @@ class CreateMenuItemUseCaseTest {
 
         then(menuItemGateway).shouldHaveNoInteractions();
         then(menuItemGateway).should(never()).save(any(), any());
-        then(updateRestaurantPublisher).shouldHaveNoInteractions();
+        then(menuItemCreatePublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -389,7 +390,7 @@ class CreateMenuItemUseCaseTest {
         given(restaurantGateway.findById(restaurantId)).willReturn(Optional.of(restaurant));
 
         // Act
-        useCase.execute(input);
+        MenuItem createdMenuItem = useCase.execute(input);
 
         // Assert
         then(menuItemGateway).should().save(menuItemCaptor.capture(), eq(restaurantId));
@@ -401,7 +402,7 @@ class CreateMenuItemUseCaseTest {
         then(restaurantGateway).should().findById(restaurantId);
         then(loggedUserGateway).should().requireCurrentUser();
         then(loggedUserGateway).should().hasRole(MenuItem.CREATE_MENU_ITEM);
-        then(updateRestaurantPublisher).should().publish(restaurant);
+        then(menuItemCreatePublisher).should().publish(new MenuItemEvent(restaurant.getId(), createdMenuItem));
     }
 
 

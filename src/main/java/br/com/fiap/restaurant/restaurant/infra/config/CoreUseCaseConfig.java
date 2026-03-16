@@ -93,7 +93,7 @@ public class CoreUseCaseConfig {
 
     @Bean
     CreateMenuItemUseCase createMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway,
-                                                RestaurantGateway restaurantGateway, RestaurantUpdatedPublisher restaurantUpdatedPublisher) {
+                                                RestaurantGateway restaurantGateway, MenuItemCreatePublisher restaurantUpdatedPublisher) {
         return new CreateMenuItemUseCase(loggedUserGateway, menuItemGateway, restaurantGateway, restaurantUpdatedPublisher);
     }
 

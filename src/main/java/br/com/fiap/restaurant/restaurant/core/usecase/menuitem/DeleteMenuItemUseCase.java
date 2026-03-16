@@ -3,6 +3,7 @@ package br.com.fiap.restaurant.restaurant.core.usecase.menuitem;
 import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
+import br.com.fiap.restaurant.restaurant.core.event.MenuItemEvent;
 import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
@@ -17,13 +18,13 @@ public class DeleteMenuItemUseCase {
     private final LoggedUserGateway loggedUserGateway;
     private final MenuItemGateway menuItemGateway;
     private final RestaurantGateway restaurantGateway;
-    private final PublisherGateway<MenuItem> deleteMenuItemPublisher;
+    private final PublisherGateway<MenuItemEvent> deleteMenuItemPublisher;
 
     public DeleteMenuItemUseCase(
             LoggedUserGateway loggedUserGateway,
             MenuItemGateway menuItemGateway,
             RestaurantGateway restaurantGateway,
-            PublisherGateway<MenuItem> deleteMenuItemPublisher
+            PublisherGateway<MenuItemEvent> deleteMenuItemPublisher
     ) {
         this.loggedUserGateway = Objects.requireNonNull(loggedUserGateway, "LoggedUserGateway cannot be null.");
         this.menuItemGateway = Objects.requireNonNull(menuItemGateway, "MenuItemGateway cannot be null.");
@@ -59,6 +60,6 @@ public class DeleteMenuItemUseCase {
         }
 
         menuItemGateway.deleteById(id);
-        deleteMenuItemPublisher.publish(menuItem);
+        deleteMenuItemPublisher.publish(new MenuItemEvent(restaurantId, menuItem));
     }
 }

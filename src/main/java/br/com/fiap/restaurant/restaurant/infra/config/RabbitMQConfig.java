@@ -20,9 +20,11 @@ public class RabbitMQConfig {
     public static final String RESTAURANT_UPDATE_ROUTING_KEY = "restaurant.update";
     public static final String RESTAURANT_DELETE_ROUTING_KEY = "restaurant.delete";
 
+    public static final String MENU_ITEM_CREATE_QUEUE = "order.menuitem.create";
     public static final String MENU_ITEM_UPDATE_QUEUE = "order.menuitem.update";
     public static final String MENU_ITEM_DELETE_QUEUE = "order.menuitem.delete";
 
+    public static final String MENU_ITEM_CREATE_ROUTING_KEY = "menuitem.create";
     public static final String MENU_ITEM_UPDATE_ROUTING_KEY = "menuitem.update";
     public static final String MENU_ITEM_DELETE_ROUTING_KEY = "menuitem.delete";
 
@@ -51,6 +53,11 @@ public class RabbitMQConfig {
         return QueueBuilder.durable(RESTAURANT_DELETE_QUEUE).quorum().build();
     }
 
+    @Bean("menuItemCreateQueue")
+    public Queue menuItemCreateQueue() {
+        return QueueBuilder.durable(MENU_ITEM_CREATE_QUEUE).quorum().build();
+    }
+
     @Bean("menuItemUpdateQueue")
     public Queue menuItemUpdateQueue() {
         return QueueBuilder.durable(MENU_ITEM_UPDATE_QUEUE).quorum().build();
@@ -69,6 +76,11 @@ public class RabbitMQConfig {
     @Bean("restaurantUpdateBind")
     public Binding restaurantUpdateBind(@Qualifier("restaurantUpdateQueue") Queue queue, @Qualifier("restaurantExchange") DirectExchange directExchange) {
         return BindingBuilder.bind(queue).to(directExchange).with(RESTAURANT_UPDATE_ROUTING_KEY);
+    }
+
+    @Bean("menuItemCreateBind")
+    public Binding menuItemCreateBind(@Qualifier("menuItemCreateQueue") Queue queue, @Qualifier("restaurantExchange") DirectExchange directExchange) {
+        return BindingBuilder.bind(queue).to(directExchange).with(MENU_ITEM_CREATE_ROUTING_KEY);
     }
 
     @Bean("menuItemUpdateBind")

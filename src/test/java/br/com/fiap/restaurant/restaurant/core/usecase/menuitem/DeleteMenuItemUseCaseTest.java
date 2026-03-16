@@ -4,6 +4,7 @@ import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
 import br.com.fiap.restaurant.restaurant.core.domain.valueobject.Address;
+import br.com.fiap.restaurant.restaurant.core.event.MenuItemEvent;
 import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
@@ -35,7 +36,7 @@ class DeleteMenuItemUseCaseTest {
     @Mock private LoggedUserGateway loggedUserGateway;
     @Mock private MenuItemGateway menuItemGateway;
     @Mock private RestaurantGateway restaurantGateway;
-    @Mock private PublisherGateway<MenuItem> deleteMenuItemPublisher;
+    @Mock private PublisherGateway<MenuItemEvent> deleteMenuItemPublisher;
 
     @InjectMocks
     private DeleteMenuItemUseCase useCase;
@@ -176,6 +177,6 @@ class DeleteMenuItemUseCaseTest {
 
         // Assert
         then(menuItemGateway).should().deleteById(itemId);
-        then(deleteMenuItemPublisher).should().publish(any(MenuItem.class));
+        then(deleteMenuItemPublisher).should().publish(any(MenuItemEvent.class));
     }
 }

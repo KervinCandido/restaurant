@@ -4,6 +4,7 @@ import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
 import br.com.fiap.restaurant.restaurant.core.domain.valueobject.Address;
+import br.com.fiap.restaurant.restaurant.core.event.MenuItemEvent;
 import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
@@ -42,7 +43,7 @@ class UpdateMenuItemUseCaseTest {
     @Mock private MenuItemGateway menuItemGateway;
     @Mock private RestaurantGateway restaurantGateway;
     @Mock private LoggedUserGateway loggedUserGateway;
-    @Mock private PublisherGateway<MenuItem> updateMenuItemPublisher;
+    @Mock private PublisherGateway<MenuItemEvent> updateMenuItemPublisher;
 
     @Captor
     private ArgumentCaptor<MenuItem> menuItemCaptor;
@@ -118,7 +119,7 @@ class UpdateMenuItemUseCaseTest {
 
         then(loggedUserGateway).should().hasRole(MenuItem.UPDATE_MENU_ITEM);
         then(loggedUserGateway).should().requireCurrentUser();
-        then(updateMenuItemPublisher).should().publish(result);
+        then(updateMenuItemPublisher).should().publish(new MenuItemEvent(restaurantId, result));
     }
 
     @Test
@@ -376,7 +377,7 @@ class UpdateMenuItemUseCaseTest {
         // Assert
         then(menuItemGateway).should(never()).existsByNameAndRestaurantId(any(), any());
         then(menuItemGateway).should().save(any(MenuItem.class), eq(restaurantId));
-        then(updateMenuItemPublisher).should().publish(menuItem);
+        then(updateMenuItemPublisher).should().publish(new MenuItemEvent(restaurantId, menuItem));
     }
 
     @Test
@@ -421,7 +422,7 @@ class UpdateMenuItemUseCaseTest {
 
         assertThat(captured.getDescription()).isNull();
         assertThat(captured.getPhotoPath()).isEqualTo("/photos/pizza.jpg");
-        then(updateMenuItemPublisher).should().publish(menuItem);
+        then(updateMenuItemPublisher).should().publish(new MenuItemEvent(restaurantId, menuItem));
     }
 
     @Test
@@ -466,7 +467,7 @@ class UpdateMenuItemUseCaseTest {
 
         assertThat(captured.getPhotoPath()).isEqualTo("/old.jpg");
         assertThat(captured.getDescription()).isEqualTo("Nova");
-        then(updateMenuItemPublisher).should().publish(menuItem);
+        then(updateMenuItemPublisher).should().publish(new MenuItemEvent(restaurantId, menuItem));
     }
 
 

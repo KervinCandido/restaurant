@@ -46,6 +46,7 @@ class RestaurantGatewayAdapterTest {
 
     @BeforeEach
     void setUp() {
+        restaurantRepository.deleteAll();
         owner = UserMapper.toDomain(userRepository
                 .findById(UUID.fromString("11111111-1111-1111-1111-111111111111"))
                 .orElseThrow(() -> new RuntimeException("User not found")));
@@ -350,9 +351,9 @@ class RestaurantGatewayAdapterTest {
     @DisplayName("Deve encontrar restaurantes por tipo de cozinha")
     void shouldFindRestaurantsByCuisineType() {
         // Given
-        adapter.save(new Restaurant(null, "Italian Place", this.address, "Italian", owner));
-        adapter.save(new Restaurant(null, "Super Italian", this.address, "Italian", owner));
-        adapter.save(new Restaurant(null, "Japanese Place", this.address, "Japanese", owner));
+        adapter.save(new Restaurant(null, "Italian Place", this.address, "Italiana", owner));
+        adapter.save(new Restaurant(null, "Super Italian", this.address, "Italiana", owner));
+        adapter.save(new Restaurant(null, "Japanese Place", this.address, "Japanesa", owner));
 
         PagedQuery<String> query = new PagedQuery<>("Italian", 0, 10);
 
@@ -361,7 +362,7 @@ class RestaurantGatewayAdapterTest {
 
         // Then
         assertThat(result.content()).hasSize(2);
-        assertThat(result.content()).extracting(Restaurant::getCuisineType).containsOnly("Italian");
+        assertThat(result.content()).extracting(Restaurant::getCuisineType).containsOnly("Italiana");
     }
 
     @Test
