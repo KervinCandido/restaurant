@@ -3,6 +3,7 @@ package br.com.fiap.restaurant.restaurant.core.usecase.menuitem;
 import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
+import br.com.fiap.restaurant.restaurant.core.event.MenuItemEvent;
 import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
@@ -19,18 +20,18 @@ public class CreateMenuItemUseCase {
     private final LoggedUserGateway loggedUserGateway;
     private final MenuItemGateway menuItemGateway;
     private final RestaurantGateway restaurantGateway;
-    private final PublisherGateway<Restaurant> updateRestaurantPublisher;
+    private final PublisherGateway<MenuItemEvent> createMenuItemPublisher;
 
     public CreateMenuItemUseCase(
             LoggedUserGateway loggedUserGateway,
             MenuItemGateway menuItemGateway,
             RestaurantGateway restaurantGateway,
-            PublisherGateway<Restaurant> updateRestaurantPublisher
+            PublisherGateway<MenuItemEvent> createMenuItemPublisher
     ) {
         this.loggedUserGateway = Objects.requireNonNull(loggedUserGateway, "LoggedUserGateway cannot be null.");
         this.menuItemGateway = Objects.requireNonNull(menuItemGateway, "MenuItemGateway cannot be null.");
         this.restaurantGateway = Objects.requireNonNull(restaurantGateway, "RestaurantGateway cannot be null.");
-        this.updateRestaurantPublisher = Objects.requireNonNull(updateRestaurantPublisher, "createRestaurantPublisher cannot be null.");
+        this.createMenuItemPublisher = Objects.requireNonNull(createMenuItemPublisher, "createMenuItemPublisher cannot be null.");
     }
 
     public MenuItem execute(CreateMenuItemInput input) {
@@ -83,7 +84,7 @@ public class CreateMenuItemUseCase {
         MenuItem saved = menuItemGateway.save(menuItem, restaurantId);
         restaurant.addMenuItem(saved);
 
-        updateRestaurantPublisher.publish(restaurant);
+        createMenuItemPublisher.publish(new MenuItemEvent(restaurantId, saved));
         return saved;
     }
 }

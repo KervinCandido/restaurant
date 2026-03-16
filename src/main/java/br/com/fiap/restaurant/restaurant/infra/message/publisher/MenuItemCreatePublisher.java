@@ -13,23 +13,23 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class MenuItemDeletedPublisher implements PublisherGateway<MenuItemEvent> {
+public class MenuItemCreatePublisher implements PublisherGateway<MenuItemEvent> {
 
-    private static final Logger logger = LoggerFactory.getLogger(MenuItemDeletedPublisher.class);
+    private static final Logger logger = LoggerFactory.getLogger(MenuItemCreatePublisher.class);
 
-    public static final String MENU_ITEM_DELETE_EVENT_TYPE = "menuitem.delete";
+    public static final String MENU_ITEM_CREATE_EVENT_TYPE = "menuitem.create";
     private final RabbitTemplate rabbitTemplate;
 
-    public MenuItemDeletedPublisher(RabbitTemplate rabbitTemplate) {
+    public MenuItemCreatePublisher(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
     public CompletableFuture<Void> publish(MenuItemEvent menuItemEvent) {
-        var eventDTO = new EventDTO<>(MENU_ITEM_DELETE_EVENT_TYPE, new MenuItemDTO(menuItemEvent));
-        logger.info("Publishing menu item delete event: {}", eventDTO);
+        var eventDTO = new EventDTO<>(MENU_ITEM_CREATE_EVENT_TYPE, new MenuItemDTO(menuItemEvent));
+        logger.info("Publishing menu item create event: {}", eventDTO);
         return CompletableFuture.runAsync(() ->
                 rabbitTemplate.convertAndSend(RabbitMQConfig.RESTAURANT_EXCHANGE,
-                        RabbitMQConfig.MENU_ITEM_DELETE_ROUTING_KEY, eventDTO));
+                        RabbitMQConfig.MENU_ITEM_CREATE_ROUTING_KEY, eventDTO));
     }
 }

@@ -1,6 +1,6 @@
 package br.com.fiap.restaurant.restaurant.infra.message.publisher;
 
-import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
+import br.com.fiap.restaurant.restaurant.core.event.MenuItemEvent;
 import br.com.fiap.restaurant.restaurant.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.restaurant.infra.config.RabbitMQConfig;
 import br.com.fiap.restaurant.restaurant.infra.message.dto.EventDTO;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class MenuItemUpdatedPublisher implements PublisherGateway<MenuItem> {
+public class MenuItemUpdatedPublisher implements PublisherGateway<MenuItemEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(MenuItemUpdatedPublisher.class);
 
@@ -25,8 +25,8 @@ public class MenuItemUpdatedPublisher implements PublisherGateway<MenuItem> {
     }
 
     @Override
-    public CompletableFuture<Void> publish(MenuItem menuItem) {
-        var eventDTO = new EventDTO<>(MENU_ITEM_UPDATE_EVENT_TYPE, new MenuItemDTO(menuItem));
+    public CompletableFuture<Void> publish(MenuItemEvent menuItemEvent) {
+        var eventDTO = new EventDTO<>(MENU_ITEM_UPDATE_EVENT_TYPE, new MenuItemDTO(menuItemEvent));
         logger.info("Publishing menu item update event: {}", eventDTO);
         return CompletableFuture.runAsync(() ->
                 rabbitTemplate.convertAndSend(RabbitMQConfig.RESTAURANT_EXCHANGE,

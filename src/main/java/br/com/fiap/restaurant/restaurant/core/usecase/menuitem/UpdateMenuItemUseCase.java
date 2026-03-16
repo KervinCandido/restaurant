@@ -1,9 +1,9 @@
 package br.com.fiap.restaurant.restaurant.core.usecase.menuitem;
 
-
 import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
 import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
+import br.com.fiap.restaurant.restaurant.core.event.MenuItemEvent;
 import br.com.fiap.restaurant.restaurant.core.exception.BusinessException;
 import br.com.fiap.restaurant.restaurant.core.exception.OperationNotAllowedException;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
@@ -19,10 +19,10 @@ public class UpdateMenuItemUseCase {
     private final LoggedUserGateway loggedUserGateway;
     private final MenuItemGateway menuItemGateway;
     private final RestaurantGateway restaurantGateway;
-    private final PublisherGateway<MenuItem> updateMenuItemPublisher;
+    private final PublisherGateway<MenuItemEvent> updateMenuItemPublisher;
 
     public UpdateMenuItemUseCase(LoggedUserGateway loggedUserGateway, MenuItemGateway menuItemGateway,
-                                 RestaurantGateway restaurantGateway, PublisherGateway<MenuItem> updateMenuItemPublisher) {
+                                 RestaurantGateway restaurantGateway, PublisherGateway<MenuItemEvent> updateMenuItemPublisher) {
         this.loggedUserGateway = Objects.requireNonNull(loggedUserGateway, "LoggedUserGateway cannot be null");
         this.menuItemGateway = Objects.requireNonNull(menuItemGateway, "MenuItemGateway cannot be null");
         this.restaurantGateway = Objects.requireNonNull(restaurantGateway, "RestaurantGateway cannot be null");
@@ -74,7 +74,7 @@ public class UpdateMenuItemUseCase {
 
         MenuItem saved = menuItemGateway.save(updatedItem, restaurantId);
 
-        updateMenuItemPublisher.publish(saved);
+        updateMenuItemPublisher.publish(new MenuItemEvent(restaurantId, saved));
         return saved;
     }
 }

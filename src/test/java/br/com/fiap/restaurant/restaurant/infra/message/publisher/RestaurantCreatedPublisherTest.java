@@ -74,6 +74,6 @@ class RestaurantCreatedPublisherTest {
         assertThat(capturedEventDTO.body().menu())
                 .isNotNull()
                 .hasSize(1)
-                .containsExactlyInAnyOrder(new MenuItemDTO(menuItem.getId(), menuItem.getName(), menuItem.getPrice(), menuItem.getRestaurantOnly()));
+                .containsExactlyInAnyOrder(new MenuItemDTO(menuItem.getId(), menuItem.getName(), menuItem.getPrice(), menuItem.getRestaurantOnly(), restaurant.getId()));
     }
 }
