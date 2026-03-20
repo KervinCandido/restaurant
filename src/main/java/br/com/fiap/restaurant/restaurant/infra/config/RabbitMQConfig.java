@@ -12,26 +12,26 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     public static final String RESTAURANT_EXCHANGE = "ex.restaurant";
-    public static final String RESTAURANT_CREATE_QUEUE = "order.restaurant.create";
-    public static final String RESTAURANT_UPDATE_QUEUE = "order.restaurant.update";
-    public static final String RESTAURANT_DELETE_QUEUE = "order.restaurant.delete";
+    public static final String RESTAURANT_CREATE_QUEUE = "order.restaurant.created";
+    public static final String RESTAURANT_UPDATE_QUEUE = "order.restaurant.updated";
+    public static final String RESTAURANT_DELETE_QUEUE = "order.restaurant.deleted";
 
-    public static final String RESTAURANT_CREATE_ROUTING_KEY = "restaurant.create";
-    public static final String RESTAURANT_UPDATE_ROUTING_KEY = "restaurant.update";
-    public static final String RESTAURANT_DELETE_ROUTING_KEY = "restaurant.delete";
+    public static final String RESTAURANT_CREATE_ROUTING_KEY = "restaurant.created";
+    public static final String RESTAURANT_UPDATE_ROUTING_KEY = "restaurant.updated";
+    public static final String RESTAURANT_DELETE_ROUTING_KEY = "restaurant.deleted";
 
-    public static final String MENU_ITEM_CREATE_QUEUE = "order.menuitem.create";
-    public static final String MENU_ITEM_UPDATE_QUEUE = "order.menuitem.update";
-    public static final String MENU_ITEM_DELETE_QUEUE = "order.menuitem.delete";
+    public static final String MENU_ITEM_CREATE_QUEUE = "order.menuitem.created";
+    public static final String MENU_ITEM_UPDATE_QUEUE = "order.menuitem.updated";
+    public static final String MENU_ITEM_DELETE_QUEUE = "order.menuitem.deleted";
 
-    public static final String MENU_ITEM_CREATE_ROUTING_KEY = "menuitem.create";
-    public static final String MENU_ITEM_UPDATE_ROUTING_KEY = "menuitem.update";
-    public static final String MENU_ITEM_DELETE_ROUTING_KEY = "menuitem.delete";
+    public static final String MENU_ITEM_CREATE_ROUTING_KEY = "menuitem.created";
+    public static final String MENU_ITEM_UPDATE_ROUTING_KEY = "menuitem.updated";
+    public static final String MENU_ITEM_DELETE_ROUTING_KEY = "menuitem.deleted";
 
     /* Consumer */
-    public static final String RESTAURANT_USER_CREATE_QUEUE = "restaurant.user.create";
-    public static final String RESTAURANT_USER_UPDATE_QUEUE = "restaurant.user.update";
-    public static final String RESTAURANT_USER_DELETE_QUEUE = "restaurant.user.delete";
+    public static final String RESTAURANT_USER_CREATE_QUEUE = "restaurant.user.created";
+    public static final String RESTAURANT_USER_UPDATE_QUEUE = "restaurant.user.updated";
+    public static final String RESTAURANT_USER_DELETE_QUEUE = "restaurant.user.deleted";
 
     @Bean("restaurantExchange")
     public DirectExchange restaurantExchange() {
