@@ -1,5 +1,7 @@
 package br.com.fiap.restaurant.restaurant.infra.config;
 
+import br.com.fiap.restaurant.restaurant.core.domain.MenuItem;
+import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.infra.controller.response.SimpleErrorResponse;
 import br.com.fiap.restaurant.restaurant.infra.persistence.repository.UserRepository;
 import br.com.fiap.restaurant.restaurant.infra.service.JwtService;
@@ -47,19 +49,26 @@ public class RouteSecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(req -> req
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers(
-                        "/v3/api-docs/**",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/actuator/health",
-                        "/api/v1/_ping"
-                ).permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth").permitAll()
-                .requestMatchers(HttpMethod.GET, restaurantUrl, restaurantWithIdUrl, menuItemBaseUrl, menuWithIdUrl).permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator", "/actuator/**").permitAll()
+                .requestMatchers(HttpMethod.POST, restaurantUrl).hasAuthority(Restaurant.CREATE_RESTAURANT)
+                .requestMatchers(HttpMethod.PUT, restaurantUrl).hasAuthority(Restaurant.UPDATE_RESTAURANT)
+                .requestMatchers(HttpMethod.DELETE, restaurantUrl).hasAuthority(Restaurant.DELETE_RESTAURANT)
+                .requestMatchers(HttpMethod.GET, restaurantUrl).permitAll()
+                .requestMatchers(HttpMethod.GET, restaurantUrl).permitAll()
+                .requestMatchers(HttpMethod.GET, restaurantWithIdUrl).permitAll()
+                .requestMatchers(HttpMethod.GET, restaurantWithIdUrl + "/management").hasAuthority(Restaurant.VIEW_RESTAURANT_MANAGEMENT)
+
+                .requestMatchers(HttpMethod.POST, menuItemBaseUrl).hasAuthority(MenuItem.CREATE_MENU_ITEM)
+                .requestMatchers(HttpMethod.PUT, menuWithIdUrl).hasAuthority(MenuItem.UPDATE_MENU_ITEM)
+                .requestMatchers(HttpMethod.DELETE, menuWithIdUrl).hasAuthority(MenuItem.DELETE_MENU_ITEM)
+                .requestMatchers(HttpMethod.GET, menuItemBaseUrl).permitAll()
+                .requestMatchers(HttpMethod.GET, menuWithIdUrl).permitAll()
+
                 .anyRequest().authenticated() // Boa prática: fechar com uma regra padrão
-            ).addFilterBefore(new TokenAuthenticationFilter(jwtService, userRepository), UsernamePasswordAuthenticationFilter.class)
+            )
+            .addFilterBefore(new TokenAuthenticationFilter(jwtService, userRepository), UsernamePasswordAuthenticationFilter.class)
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
-        http.exceptionHandling(customizer ->
+            http.exceptionHandling(customizer ->
             customizer.accessDeniedHandler(accessDeniedHandler())
                     .authenticationEntryPoint(authenticationEntryPoint())
         );

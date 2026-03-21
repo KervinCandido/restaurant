@@ -37,7 +37,7 @@ public class ErrorHandle {
     @ResponseStatus(code = HttpStatus.FORBIDDEN)
     @ExceptionHandler(AccessDeniedException.class)
     public SimpleErrorResponse handleAccessDeniedException(AccessDeniedException e) {
-        return new SimpleErrorResponse("Acesso negado.");
+        return new SimpleErrorResponse(e.getMessage());
     }
 
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED)

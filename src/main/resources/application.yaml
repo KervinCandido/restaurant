@@ -19,7 +19,7 @@ spring:
     password: ${MQ_PASSWORD:password-mq}
     listener.simple.acknowledge-mode: manual
 server:
-  port: 8081
+  port: 8080
 springdoc:
   api-docs:
     enabled: true
