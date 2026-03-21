@@ -9,6 +9,7 @@ import br.com.fiap.restaurant.restaurant.infra.controller.response.RestaurantSum
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -60,6 +61,7 @@ public class RestaurantRestController {
             @ApiResponse(responseCode = "200", description = "Restaurante encontrado."),
             @ApiResponse(responseCode = "404", description = "Restaurante não encontrado.")
     })
+    @SecurityRequirements
     @GetMapping("/{id}")
     public ResponseEntity<RestaurantSummaryResponse> getPublicById(@PathVariable("id") Long id) {
         return restaurantController.findById(id).map(restaurantRestMapper::toResponseSummary).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
@@ -79,6 +81,7 @@ public class RestaurantRestController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de restaurantes retornada com sucesso.")
     })
+    @SecurityRequirements
     @GetMapping
     public Page<RestaurantSummaryResponse> listPaged(
             @RequestParam(required = false) String cuisineType,

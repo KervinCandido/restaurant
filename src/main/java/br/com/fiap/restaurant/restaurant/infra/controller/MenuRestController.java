@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,7 @@ public class MenuRestController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Itens do cardápio listados com sucesso.")
     })
+    @SecurityRequirements
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<MenuItemResponse> findAll (
@@ -94,6 +96,7 @@ public class MenuRestController {
             @ApiResponse(responseCode = "200", description = "Item encontrado."),
             @ApiResponse(responseCode = "404", description = "Item não encontrado.")
     })
+    @SecurityRequirements
     @GetMapping("/{id}")
     public ResponseEntity<MenuItemResponse> getById(
             @Parameter(description = "ID do restaurante (não utilizado na lógica, mas parte da URL)") @PathVariable("restaurant-id") Long restaurantId,
