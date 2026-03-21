@@ -1,5 +1,6 @@
 package br.com.fiap.restaurant.restaurant.infra.controller;
 
+import br.com.fiap.restaurant.restaurant.core.domain.Restaurant;
 import br.com.fiap.restaurant.restaurant.core.domain.User;
 import br.com.fiap.restaurant.restaurant.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.restaurant.infra.controller.request.AddressRequest;
@@ -130,7 +131,7 @@ class RestaurantRestControllerTestIT {
     }
     
     @Test
-    @WithMockUser(authorities = {"VIEW_RESTAURANT"})
+    @WithMockUser(authorities = {Restaurant.VIEW_RESTAURANT_MANAGEMENT})
     @DisplayName("Deve buscar restaurante por id para gestao")
     void shouldGetManagementRestaurantById() throws Exception {
         mockMvc.perform(get("/restaurants/{id}/management", restaurantId))
