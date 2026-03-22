@@ -49,11 +49,10 @@ public class RouteSecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(req -> req
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator", "/actuator/**").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/**").permitAll()
                 .requestMatchers(HttpMethod.POST, restaurantUrl).hasAuthority(Restaurant.CREATE_RESTAURANT)
                 .requestMatchers(HttpMethod.PUT, restaurantUrl).hasAuthority(Restaurant.UPDATE_RESTAURANT)
                 .requestMatchers(HttpMethod.DELETE, restaurantUrl).hasAuthority(Restaurant.DELETE_RESTAURANT)
-                .requestMatchers(HttpMethod.GET, restaurantUrl).permitAll()
                 .requestMatchers(HttpMethod.GET, restaurantUrl).permitAll()
                 .requestMatchers(HttpMethod.GET, restaurantWithIdUrl).permitAll()
                 .requestMatchers(HttpMethod.GET, restaurantWithIdUrl + "/management").hasAuthority(Restaurant.VIEW_RESTAURANT_MANAGEMENT)
