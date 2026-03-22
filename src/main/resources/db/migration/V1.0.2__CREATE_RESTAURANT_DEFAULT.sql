@@ -21,26 +21,3 @@ VALUES
 -- Burger Tech (Final de semana inteiro)
 (2, 'SATURDAY', '11:00:00', '23:59:00'),
 (2, 'SUNDAY', '11:00:00', '22:00:00');
-
--- Criando os usuários
-INSERT INTO users (uuid)
-VALUES
-    ('22222222-2222-2222-2222-222222222222'), -- Funcionário 1
-    ('33333333-3333-3333-3333-333333333333'); -- Funcionário 2
-
--- Atribuindo papéis (roles) básicos para que eles possam trabalhar no sistema
-INSERT INTO user_roles (user_uuid, role_name)
-VALUES
-    ('22222222-2222-2222-2222-222222222222', 'VIEW_RESTAURANT'),
-    ('22222222-2222-2222-2222-222222222222', 'VIEW_RESTAURANT_MANAGEMENT'),
-    ('22222222-2222-2222-2222-222222222222', 'UPDATE_MENU_ITEM'),
-    ('22222222-2222-2222-2222-222222222222', 'VIEW_MENU_ITEM'),
-    ('33333333-3333-3333-3333-333333333333', 'VIEW_RESTAURANT'),
-    ('33333333-3333-3333-3333-333333333333', 'VIEW_RESTAURANT_MANAGEMENT'),
-    ('33333333-3333-3333-3333-333333333333', 'UPDATE_MENU_ITEM'),
-    ('33333333-3333-3333-3333-333333333333', 'VIEW_MENU_ITEM');
-
-INSERT INTO restaurant_employees (restaurant_id, employee_uuid)
-VALUES
-    (1, '22222222-2222-2222-2222-222222222222'), -- Funcionário 1 no Bella Italia (ID 1)
-    (2, '33333333-3333-3333-3333-333333333333'); -- Funcionário 2 no Burger Tech (ID 2)
